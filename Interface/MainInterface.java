@@ -30,7 +30,7 @@ public class MainInterface extends Application {
 
         Scene scene = new Scene(root, 600, 600);
 
-        primaryStage.setTitle("Bibliotech");
+        primaryStage.setTitle("Library");
         primaryStage.setScene(scene);
         primaryStage.setMinWidth(500);
         primaryStage.setMinHeight(450);
