@@ -84,21 +84,21 @@ public class InterfaceModules {
        
         GridPane gridpane = new GridPane();
 
-        Label lbl_title = new Label("Registrar Estudiantes");
-        Label lbl_name = new Label("Nombre");
-        Label lbl_entryYear = new Label("Año de ingreso");
-        Label lbl_exception= new Label("Ingresar datos correctamente");
+        Label lbl_title = new Label("Add Students");
+        Label lbl_name = new Label("Name");
+        Label lbl_entryYear = new Label("Entry year");
+        Label lbl_exception= new Label("Insert data correctly");
         lbl_exception.setVisible(false);
 
         TextField tf_name = new TextField();
         TextField tf_entryYear = new TextField();
 
-        tf_name.setPromptText("Nombre");
-        tf_entryYear.setPromptText("Año");;
+        tf_name.setPromptText("Name");
+        tf_entryYear.setPromptText("Year");;
 
         ComboBox<String> cb_career = new ComboBox<>();
         cb_career.getItems().addAll("Informática", "Administración", "Turismo");
-        cb_career.setPromptText("Carrera");
+        cb_career.setPromptText("Career");
         cb_career.setEditable(false);
 
         cb_career.setOnAction((event) -> {
@@ -170,7 +170,7 @@ public class InterfaceModules {
         table.setItems(observableArrayStudent);
         table.setEditable(false);
 
-        Button btn_showRecords= new Button("Ver Registros");
+        Button btn_showRecords= new Button("See Records");
         btn_showRecords.setOnAction((event) -> {
             try {
                 table.setItems(FXCollections.observableArrayList(sft.readList()));
