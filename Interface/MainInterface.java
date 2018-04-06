@@ -19,18 +19,23 @@ import javafx.stage.Stage;
 
 public class MainInterface extends Application {
 
-    VBox presentador = new VBox();
+    //Instancia del HBox que tendrá la funcion de presentar cada interfaz
+    VBox presenter = new VBox();
+    //Instanciamos la cable InterfaceModules para manejar sus metodos
     InterfaceModules interfaceM = new InterfaceModules();
 
     @Override
     public void start(Stage primaryStage) {
 
+        //Creacion de la "raiz" sobre la que se presentará el "Front-end" 
         BorderPane root = new BorderPane();
         root.getChildren().add(menuBar());
         root.setTop(menuBar());
 
+        //Instancia de la escena con su parametro y medidas
         Scene scene = new Scene(root, 600, 600);
 
+        //Manejo del escenario  
         primaryStage.setTitle("Library");
         primaryStage.setScene(scene);
         primaryStage.setMinWidth(500);
@@ -42,105 +47,120 @@ public class MainInterface extends Application {
 
     public VBox menuBar() {
 
+        //HBox y VBox
         HBox hbx_window = new HBox();
         VBox vbx_upperSide = new VBox();
 
+        //Modificaciones del HBox
         hbx_window.setAlignment(Pos.CENTER);
         hbx_window.setSpacing(10);
 
         Scene scene = new Scene(new VBox(), 1000, 650);
 
-        //Menu que despliega categorias principales
-        Menu mnu_menuStudents = new Menu("Estudiantes");
+        //Menu que despliega categor'ias principales
+        //Categor'ia estudiantes
+        Menu mnu_menuStudents = new Menu("Students");
         mnu_menuStudents.setMnemonicParsing(true);
 
-        MenuItem mim_enterStudent = new MenuItem("Ingresar");
+        //Subcategor'ia para ingresar y ver estudiantes
+        MenuItem mim_enterStudent = new MenuItem("Enter new Student");
         mim_enterStudent.setOnAction((event) -> {
-            presentador.getChildren().clear();
+            presenter.getChildren().clear();
             hbx_window.getChildren().clear();
             hbx_window.getChildren().addAll(interfaceM.studentRegister(), interfaceM.showTableView());
         });
 
         mnu_menuStudents.getItems().addAll(mim_enterStudent);
 
-        Menu mnu_menuMaterials = new Menu("Materiales");
+        //Categor'ia materiales
+        Menu mnu_menuMaterials = new Menu("Materials");
         mnu_menuMaterials.setMnemonicParsing(true);
 
-        MenuItem mim_enterBooks = new MenuItem("Libros");
+        //Subcategor'ia de materiales para ingresar un libro
+        MenuItem mim_enterBooks = new MenuItem("Enter Books");
         mim_enterBooks.setOnAction((event) -> {
             try {
                 hbx_window.getChildren().clear();
-                presentador.getChildren().clear();
-                presentador.getChildren().addAll(interfaceM.enterBooks());
+                presenter.getChildren().clear();
+                presenter.getChildren().addAll(interfaceM.enterBooks());
             } catch (IOException ex) {
                 Logger.getLogger(MainInterface.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
 
-        MenuItem mim_enterAudiovisual = new MenuItem("Audiovisual");
+        //Subcategor'ia de materiales para ingresar art'iculos Audiovisuales
+        MenuItem mim_enterAudiovisual = new MenuItem("Enter Audiovisual");
         mim_enterAudiovisual.setOnAction((event) -> {
             hbx_window.getChildren().clear();
-            presentador.getChildren().clear();
-            presentador.getChildren().addAll(interfaceM.enterAudioVisual());
+            presenter.getChildren().clear();
+            presenter.getChildren().addAll(interfaceM.enterAudioVisual());
         });
 
-        MenuItem mim_enterView = new MenuItem("Mostrar");
+        //Subcategor'ia de materiales para ver los materiales registrados
+        MenuItem mim_enterView = new MenuItem("View Material");
         mim_enterView.setOnAction((event) -> {
             try {
                 hbx_window.getChildren().clear();
-                presentador.getChildren().clear();
-                presentador.getChildren().addAll(interfaceM.viewMaterial());
+                presenter.getChildren().clear();
+                presenter.getChildren().addAll(interfaceM.viewMaterial());
             } catch (IOException ex) {
                 Logger.getLogger(MainInterface.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
 
+        //Agregaci'on de las subcategor'ias a la categor'ia materiales
         mnu_menuMaterials.getItems().addAll(mim_enterBooks, mim_enterAudiovisual, mim_enterView);
 
-        Menu mnu_menuLoans = new Menu("Prestamos");
+        //Categor'ia prestamos
+        Menu mnu_menuLoans = new Menu("Loans");
         mnu_menuLoans.setMnemonicParsing(true);
 
-        MenuItem mim_performLoan = new MenuItem("Realizar Prestamo");
+        //Subcategor'ia de pr'estamos para realizar un prestamo
+        MenuItem mim_performLoan = new MenuItem("Make a loan");
         mim_performLoan.setOnAction((event) -> {
             try {
                 hbx_window.getChildren().clear();
-                presentador.getChildren().clear();
-                presentador.getChildren().addAll(interfaceM.enterLoan());
+                presenter.getChildren().clear();
+                presenter.getChildren().addAll(interfaceM.enterLoan());
             } catch (IOException ex) {
                 Logger.getLogger(MainInterface.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
 
-        MenuItem mim_deleteLoan = new MenuItem("Eliminar Prestamo");
+        //Subcategor'ia de pr'estamos para eliminar un pr'estamo
+        MenuItem mim_deleteLoan = new MenuItem("Delete loan");
         mim_deleteLoan.setOnAction((event) -> {
-            
-                
+
             try {
                 hbx_window.getChildren().clear();
-                presentador.getChildren().clear();
-                presentador.getChildren().addAll(interfaceM.deleteLoans());
+                presenter.getChildren().clear();
+                presenter.getChildren().addAll(interfaceM.deleteLoans());
             } catch (IOException ex) {
                 Logger.getLogger(MainInterface.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
         });
 
-        MenuItem mim_loansView = new MenuItem("Mostrar");
+        //Subcategor'ia de pr'estamos para ver los pr'estamos realizados
+        MenuItem mim_loansView = new MenuItem("View Loans");
         mim_loansView.setOnAction((event) -> {
 
             try {
                 hbx_window.getChildren().clear();
-                presentador.getChildren().clear();
-                presentador.getChildren().addAll(interfaceM.viewLoans());
+                presenter.getChildren().clear();
+                presenter.getChildren().addAll(interfaceM.viewLoans());
             } catch (IOException ex) {
                 Logger.getLogger(MainInterface.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
 
+        //Agregaci'on de las subcategor'ias a la categor'ia pr'estamos
         mnu_menuLoans.getItems().addAll(mim_performLoan, mim_deleteLoan, mim_loansView);
 
+        //Creaci'on del MenuBar que depliega las opciones a elegir
         MenuBar mnb_mainMenu = new MenuBar();
         mnb_mainMenu.setStyle("-fx-background-color: white");
+        //Agregaci'on de las categor'ias al MenuBar
         mnb_mainMenu.getMenus().addAll(mnu_menuStudents, mnu_menuMaterials, mnu_menuLoans);
 
         //Despliegue del logo en el programa
@@ -149,19 +169,21 @@ public class MainInterface extends Application {
         imv_logo.setImage(img_logo);
         imv_logo.setFitHeight(170);
         imv_logo.setFitWidth(1100);
-        
+
         vbx_upperSide.setStyle("-fx-background-color: DIMGRAY");
 
-        presentador.setPrefSize(scene.getWidth(), scene.getWidth());
+        //Tamaño del presentador
+        presenter.setPrefSize(scene.getWidth(), scene.getWidth());
 
-        vbx_upperSide.getChildren().addAll(imv_logo, mnb_mainMenu, hbx_window, presentador);
+        //Agregaci'on de todos los componentes de la interfaz 
+        vbx_upperSide.getChildren().addAll(imv_logo, mnb_mainMenu, hbx_window, presenter);
 
         return vbx_upperSide;
-    }
+
+    }//end menuBar()
 
     public static void main(String[] args) throws IOException {
         launch(args);
+    }//end main()
 
-    }
-
-}
+}//end mainInterface

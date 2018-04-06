@@ -53,17 +53,15 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.util.Callback;
 import javafx.util.converter.LocalDateStringConverter;
-import javax.swing.JOptionPane;
 import org.controlsfx.control.textfield.TextFields;
-//import org.controlsfx.control.textfield.TextFields;
 
 public class InterfaceModules {
 
+    //Creacion e instancia de las variables globales
     ObservableList<Student> observableArrayStudent = FXCollections.observableArrayList();
     ArrayList<Student> arrayListStudent = new ArrayList<>();
-    LogicalMethods methods = new LogicalMethods();    
+    LogicalMethods methods = new LogicalMethods();
     static String genre, idiom;
     static int valueDelivery1, valueDelivery2, valueDelivery3;
     static LocalDate date1;
@@ -76,54 +74,60 @@ public class InterfaceModules {
     static AudioVisualFile avf;
     static String signatureB, signatureAV, signature, idLoan;
     static MainInterface mI = new MainInterface();
-    StudentFile sft= new StudentFile();
+    StudentFile sft = new StudentFile();
     File file = new File("studentFile.txt");
-    
 
+    //Interfaz para registrar a un estudiante con su ID, nombre y año de ingreso
     public GridPane studentRegister() {
-       
+
         GridPane gridpane = new GridPane();
 
+        //Labels
         Label lbl_title = new Label("Add Students");
         Label lbl_name = new Label("Name");
         Label lbl_entryYear = new Label("Entry year");
-        Label lbl_exception= new Label("Insert data correctly");
+        Label lbl_exception = new Label("Insert data correctly");
         lbl_exception.setVisible(false);
 
+        //TextFields
         TextField tf_name = new TextField();
         TextField tf_entryYear = new TextField();
 
         tf_name.setPromptText("Name");
         tf_entryYear.setPromptText("Year");;
 
+        //ComboBox para opciones de carreras existentes
         ComboBox<String> cb_career = new ComboBox<>();
         cb_career.getItems().addAll("Informática", "Administración", "Turismo");
         cb_career.setPromptText("Career");
         cb_career.setEditable(false);
 
+        //Funcion del ComboBox
         cb_career.setOnAction((event) -> {
-            try{
-             String name= tf_name.getText();
-             int year= Integer.parseInt(tf_entryYear.getText());
-                
-            if (tf_name.getText().length()>0 && tf_entryYear.getText().length()>0 && cb_career.getValue().length()>0) {
-                Student s = new Student(name, year,
-                        cb_career.getValue(), "metodo", methods.getStudentId(cb_career.getValue(), tf_entryYear.getText(), arrayListStudent.size()));
+            try {
+                String name = tf_name.getText();
+                int year = Integer.parseInt(tf_entryYear.getText());
 
-                observableArrayStudent.add(s);
-                
-                if(file.exists())
-                sft.serializeList(s);
-                else
-                sft.serializeStudent(s);
-                 
-                //arrayListStudent.add(s);
+                if (tf_name.getText().length() > 0 && tf_entryYear.getText().length() > 0 && cb_career.getValue().length() > 0) {
+                    Student s = new Student(name, year,
+                            cb_career.getValue(), "metodo", methods.getStudentId(cb_career.getValue(), tf_entryYear.getText(),
+                            arrayListStudent.size()));
 
-                tf_name.clear();
-                tf_entryYear.clear();
-                
-            }
-            }catch(NumberFormatException nfe){
+                    //Se añade al obsevable list
+                    observableArrayStudent.add(s);
+
+                    if (file.exists()) {
+                        sft.serializeList(s);
+                    } else {
+                        sft.serializeStudent(s);
+                    }
+
+                    //arrayListStudent.add(s);
+                    tf_name.clear();
+                    tf_entryYear.clear();
+
+                }
+            } catch (NumberFormatException nfe) {
                 lbl_exception.setVisible(true);
                 tf_name.clear();
                 tf_entryYear.clear();
@@ -132,9 +136,10 @@ public class InterfaceModules {
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
         });
 
+        //Agregación de los nodulos al GridPane que se retorna
         gridpane.add(lbl_title, 0, 0);
         gridpane.add(lbl_name, 0, 2);
         gridpane.add(tf_name, 0, 3);
@@ -148,29 +153,39 @@ public class InterfaceModules {
     }
 
     public VBox showTableView() {
-        
+
+        //Se crea una tabla (Tableview) que mostrar'a la lista de estudiantes registrados
         TableView<Student> table = new TableView<>();
 
-        TableColumn columnId = new TableColumn("Carnet");
+        TableColumn columnId = new TableColumn("ID");
+        columnId.setMinWidth(100);
         columnId.setCellValueFactory(new PropertyValueFactory("id"));
 
-        TableColumn columnName = new TableColumn("Nombre");
+        TableColumn columnName = new TableColumn("Name");
+        columnName.setMinWidth(100);
         columnName.setCellValueFactory(new PropertyValueFactory("name"));
 
-        TableColumn columnYear = new TableColumn("Año Ingreso");
+        TableColumn columnYear = new TableColumn("Year of income");
+        columnYear.setMinWidth(150);
         columnYear.setCellValueFactory(new PropertyValueFactory("entryYear"));
 
-        TableColumn columnCareer = new TableColumn("Carrera");
+        TableColumn columnCareer = new TableColumn("Career");
+        columnCareer.setMinWidth(100);
         columnCareer.setCellValueFactory(new PropertyValueFactory("career"));
 
-        TableColumn columnLoans = new TableColumn("Préstamos");
+        TableColumn columnLoans = new TableColumn("Loans");
+        columnLoans.setMinWidth(100);
         columnLoans.setCellValueFactory(new PropertyValueFactory("previousLoans"));
+        
+//        table.setItems(observableArrayStudent);
 
+        //Agregacion de n'odulos a la tabla
         table.getColumns().addAll(columnId, columnName, columnYear, columnCareer, columnLoans);
-        table.setItems(observableArrayStudent);
+        table.setPrefSize(550, 400);        
         table.setEditable(false);
 
-        Button btn_showRecords= new Button("See Records");
+        //Bot'on para mostrar la lista de estudiantes
+        Button btn_showRecords = new Button("See Records");
         btn_showRecords.setOnAction((event) -> {
             try {
                 table.setItems(FXCollections.observableArrayList(sft.readList()));
@@ -181,7 +196,7 @@ public class InterfaceModules {
             }
         });
         
-        HBox hbox_buttons= new HBox();
+        HBox hbox_buttons = new HBox();
         hbox_buttons.getChildren().addAll(btn_showRecords);
 
         VBox vbox = new VBox();
@@ -211,15 +226,15 @@ public class InterfaceModules {
         gpn_enterBooks.getRowConstraints().add(new RowConstraints(60));
         gpn_enterBooks.setAlignment(Pos.CENTER);
 
-        Label lbl_name = new Label("Título");
+        Label lbl_name = new Label("Title");
         lbl_name.setTextFill(Color.BLACK);
         lbl_name.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterBooks.add(lbl_name, 0, 0);
 
         TextField tfd_name = new TextField();
         gpn_enterBooks.add(tfd_name, 1, 0);
-        
-        Label lbl_signatureB = new Label("Signatura");
+
+        Label lbl_signatureB = new Label("Signature");
         lbl_signatureB.setTextFill(Color.BLACK);
         lbl_signatureB.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterBooks.add(lbl_signatureB, 3, 0);
@@ -227,7 +242,7 @@ public class InterfaceModules {
         TextField tfd_signatureB = new TextField();
         gpn_enterBooks.add(tfd_signatureB, 4, 0);
 
-        Label lbl_author = new Label("Autor");
+        Label lbl_author = new Label("Author");
         lbl_author.setTextFill(Color.BLACK);
         lbl_author.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterBooks.add(lbl_author, 0, 2);
@@ -235,17 +250,17 @@ public class InterfaceModules {
         TextField tfd_author = new TextField();
         gpn_enterBooks.add(tfd_author, 1, 2);
 
-        Label lbl_genre = new Label("Género");
+        Label lbl_genre = new Label("Genre");
         lbl_genre.setTextFill(Color.BLACK);
         lbl_genre.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterBooks.add(lbl_genre, 3, 2);
 
         ComboBox cbx_genre = new ComboBox();
         cbx_genre.setPrefWidth(400);
-        cbx_genre.getItems().addAll("Bibliografía", "Clásicos de la Literatura", "Comics", "Ensayos",
-                "Fantasía", "Ficción Literaria", "Historia", "Humor", "Infantil", "Poesía", "Romántico",
-                "Académico", "Otro");
-        cbx_genre.setValue("Académico");
+        cbx_genre.getItems().addAll("Bibliography", "Classics of Literature", "Comics", "Essays",
+                "Fantasy", "Literary Fiction", "History", "Humor", "Infantile", "Poetry", "Romantic",
+                "Academic", "Other");
+        cbx_genre.setValue("Academic");
 
         cbx_genre.valueProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -255,16 +270,16 @@ public class InterfaceModules {
         });
         gpn_enterBooks.add(cbx_genre, 4, 2);
 
-        Label lbl_idiom = new Label("Idioma");
+        Label lbl_idiom = new Label("Idiom");
         lbl_idiom.setTextFill(Color.BLACK);
         lbl_idiom.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterBooks.add(lbl_idiom, 0, 4);
 
         ComboBox cbx_idiom = new ComboBox();
         cbx_idiom.setPrefWidth(400);
-        cbx_idiom.getItems().addAll("Inglés", "Español", "Chino", "Alemán",
-                "Frances", "Portugués", "Otro");
-        cbx_idiom.setValue("Español");
+        cbx_idiom.getItems().addAll("English", "Spanish", "Chinesse", "German",
+                "French", "Portuguese", "Other");
+        cbx_idiom.setValue("Spanish");
 
         cbx_idiom.valueProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -274,7 +289,7 @@ public class InterfaceModules {
         });
         gpn_enterBooks.add(cbx_idiom, 1, 4);
 
-        Label lbl_description = new Label("Descripción");
+        Label lbl_description = new Label("Description");
         lbl_description.setTextFill(Color.BLACK);
         lbl_description.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterBooks.add(lbl_description, 3, 4);
@@ -283,49 +298,45 @@ public class InterfaceModules {
         txa_description.setPrefSize(400, 500);
         gpn_enterBooks.add(txa_description, 4, 4);
 
-        Button btn_enterBook = new Button("Ingresar Libro");
+        Button btn_enterBook = new Button("Enter Book");
         btn_enterBook.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
             public void handle(ActionEvent event) {
-                
-                genre = cbx_genre.getValue()+"";
-                idiom = cbx_idiom.getValue()+"";
+
+                genre = cbx_genre.getValue() + "";
+                idiom = cbx_idiom.getValue() + "";
                 try {
-                    
+
                     BooksFile bfile = new BooksFile(new File("./Books.dat"));
-                    
-                    Books book1 = new Books(tfd_author.getText(), genre, idiom, tfd_name.getText(),tfd_signatureB.getText(), 1, txa_description.getText());
-                    
-                    Label lbl_success = new Label("¡Libro ingresado con exito!");
+
+                    Books book1 = new Books(tfd_author.getText(), genre, idiom, tfd_name.getText(), tfd_signatureB.getText(), 1, txa_description.getText());
+
+                    Label lbl_success = new Label("¡Book entered successfully!");
                     lbl_success.setTextFill(Color.GREEN);
                     lbl_success.setFont(Font.font("Arial", FontWeight.BOLD, 15));
                     lbl_success.setVisible(false);
                     gpn_enterBooks.add(lbl_success, 3, 7, 4, 4);
-                    
-                    Label lbl_error = new Label("Llene todos los datos");
+
+                    Label lbl_error = new Label("Unfilled spaces");
                     lbl_error.setVisible(false);
                     gpn_enterBooks.add(lbl_error, 3, 7, 4, 4);
 
-                    if(bfile.avaibilityBook(book1.getSignature(),1)){
+                    if (bfile.avaibilityBook(book1.getSignature(), 1)) {
                         lbl_success.setVisible(true);
-                        
-                    } else if(tfd_author.getText().isEmpty() || tfd_name.getText().isEmpty() || tfd_signatureB.getText().isEmpty() || txa_description.getText().isEmpty()){
+
+                    } else if (tfd_author.getText().isEmpty() || tfd_name.getText().isEmpty() || tfd_signatureB.getText().isEmpty() || txa_description.getText().isEmpty()) {
                         lbl_error.setVisible(true);
                         lbl_success.setVisible(false);
-                    }else{
+                    } else {
                         lbl_success.setVisible(true);
-                        
-                        
-                    
+
                         bfile.addEndRecord(book1);
                         bfile.close();
                     }
-                    
-                    
-                    
+
                 } catch (IOException ex) {
-                    Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, "Error insertando libro", ex);
+                    Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, "Error inserting book", ex);
                 }
 
                 tfd_name.setText("");
@@ -369,7 +380,7 @@ public class InterfaceModules {
         TextField tfd_kind = new TextField();
         gpn_enterAudioV.add(tfd_kind, 1, 0);
 
-        Label lbl_signatureAV = new Label("Signatura:");
+        Label lbl_signatureAV = new Label("Signature:");
         lbl_signatureAV.setTextFill(Color.BLACK);
         lbl_signatureAV.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterAudioV.add(lbl_signatureAV, 3, 0);
@@ -377,7 +388,7 @@ public class InterfaceModules {
         TextField tfd_signatureAV = new TextField();
         gpn_enterAudioV.add(tfd_signatureAV, 4, 0);
 
-        Label lbl_brand = new Label("Marca:");
+        Label lbl_brand = new Label("Brand:");
         lbl_brand.setTextFill(Color.BLACK);
         lbl_brand.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterAudioV.add(lbl_brand, 0, 2);
@@ -392,8 +403,7 @@ public class InterfaceModules {
 //
 //        TextField tfd_model = new TextField();
 //        gpn_enterAudioV.add(tfd_model, 4, 2);
-
-        Label lbl_description = new Label("Descripción:");
+        Label lbl_description = new Label("Description:");
         lbl_description.setTextFill(Color.BLACK);
         lbl_description.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterAudioV.add(lbl_description, 0, 4);
@@ -402,45 +412,43 @@ public class InterfaceModules {
         txa_description.setPrefSize(300, 400);
         gpn_enterAudioV.add(txa_description, 1, 4);
 
-        Button btn_enterAudioV = new Button("Ingresar Artículo");
+        Button btn_enterAudioV = new Button("Enter Article");
         btn_enterAudioV.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
             public void handle(ActionEvent event) {
                 try {
-                    
+
                     AudioVisualFile afile = new AudioVisualFile(new File("./AudioVisual.dat"));
-                    
+
                     AudioVisual audioVisual = new AudioVisual(tfd_brand.getText(), tfd_kind.getText(), tfd_signatureAV.getText(), 1, txa_description.getText());
-                    
-                   
-                    Label lbl_success = new Label("¡AudioVisual ingresado con exito!");
+
+                    Label lbl_success = new Label("¡Article entered successfully!");
                     lbl_success.setTextFill(Color.GREEN);
                     lbl_success.setFont(Font.font("Arial", FontWeight.BOLD, 15));
                     lbl_success.setVisible(false);
-                        gpn_enterAudioV.add(lbl_success, 3, 7, 4, 4);
+                    gpn_enterAudioV.add(lbl_success, 3, 7, 4, 4);
 
-                    Label lbl_error = new Label("Llene todos los datos");
+                    Label lbl_error = new Label("Unfilled spaces");
                     lbl_error.setVisible(false);
-                        gpn_enterAudioV.add(lbl_error, 3, 7, 4, 4);
-                    
+                    gpn_enterAudioV.add(lbl_error, 3, 7, 4, 4);
+
                     //condicional que verifica si y existe para aumentar disponibilidad o ingresar como articulo nuevo
-                    if(afile.avaibilityAudioVisual(audioVisual.getSignature(),1)){
+                    if (afile.avaibilityAudioVisual(audioVisual.getSignature(), 1)) {
                         lbl_success.setVisible(true);
                         lbl_error.setVisible(false);
-                    }else if(tfd_brand.getText().isEmpty() || tfd_kind.getText().isEmpty() || tfd_signatureAV.getText().isEmpty() || txa_description.getText().isEmpty()){
+                    } else if (tfd_brand.getText().isEmpty() || tfd_kind.getText().isEmpty() || tfd_signatureAV.getText().isEmpty() || txa_description.getText().isEmpty()) {
                         lbl_success.setVisible(false);
                         lbl_error.setVisible(true);
-                    }else{
+                    } else {
                         lbl_success.setVisible(true);
                         lbl_error.setVisible(false);
                         afile.addEndRecord(audioVisual);
                         afile.close();
-                    }    
-                    
-                    
+                    }
+
                 } catch (IOException ex) {
-                    Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, "Error insertando libro", ex);
+                    Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, "Error inserting article", ex);
                 }
 
                 tfd_kind.setText("");
@@ -465,34 +473,32 @@ public class InterfaceModules {
         gpn_viewMaterial.setVgap(12);
         gpn_viewMaterial.setHgap(12);
 
-        
         //TableView que muestra materiales audiovisuales
         TableView<AudioVisual> tvw_viewAudiovisual = new TableView();
         tvw_viewAudiovisual.setVisible(false);
-        
-        
+
         AudioVisualFile avf = new AudioVisualFile(new File("./AudioVisual.dat"));
         ObservableList<AudioVisual> audioVisuals = avf.getAudioVisuals();
         tvw_viewAudiovisual.setItems(audioVisuals);
 
 //      Falta el observableList // agregado arriba        
-        TableColumn nameAVColumn = new TableColumn("Nombre");
+        TableColumn nameAVColumn = new TableColumn("Name");
         nameAVColumn.setMinWidth(150);
         nameAVColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-        TableColumn signatureAVColumn = new TableColumn("Signatura");
+        TableColumn signatureAVColumn = new TableColumn("Signature");
         signatureAVColumn.setMinWidth(150);
         signatureAVColumn.setCellValueFactory(new PropertyValueFactory<>("signature"));
 
-        TableColumn brandAVColumn = new TableColumn("Marca");
+        TableColumn brandAVColumn = new TableColumn("Brand");
         brandAVColumn.setMinWidth(150);
         brandAVColumn.setCellValueFactory(new PropertyValueFactory<>("brand"));
 
-        TableColumn availabilityAVColumn = new TableColumn("Disponibilidad");
+        TableColumn availabilityAVColumn = new TableColumn("Availability");
         availabilityAVColumn.setMinWidth(150);
         availabilityAVColumn.setCellValueFactory(new PropertyValueFactory<>("availability"));
 
-        TableColumn descritionAVColumn = new TableColumn("Descripcion");
+        TableColumn descritionAVColumn = new TableColumn("Description");
         descritionAVColumn.setMinWidth(150);
         descritionAVColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
 
@@ -500,37 +506,37 @@ public class InterfaceModules {
         tvw_viewAudiovisual.setPrefSize(750, 475);
         tvw_viewAudiovisual.setTableMenuButtonVisible(true);
         gpn_viewMaterial.add(tvw_viewAudiovisual, 1, 1);
-        
+
         HBox hbx_2nodes = new HBox();
         hbx_2nodes.setSpacing(10);
-        
+
         //label por si no selecciono un item en la tabla
-        Label lbl_unselected_row = new Label("No ha seleccionado un ejemplar");
+        Label lbl_unselected_row = new Label("You have not selected any article");
         lbl_unselected_row.setVisible(false);
         lbl_unselected_row.setTextFill(Color.RED);
         lbl_unselected_row.setFont(Font.font("Arial", FontWeight.BOLD, 15));
-        
+
         //exito al ingresar ejemplares
         Label lbl_success_row = new Label("Increased succesfully!");
         lbl_success_row.setVisible(false);
         lbl_success_row.setTextFill(Color.GREEN);
         lbl_success_row.setFont(Font.font("Arial", FontWeight.BOLD, 15));
-        
+
         //boton para aumentar la disponibilidad audiovisual
-        Button btn_increaseAvaibility = new Button("Aumentar disponibilidad");
+        Button btn_increaseAvaibility = new Button("Increase availability");
         btn_increaseAvaibility.setVisible(false);
-        
+
         //se annaden el boton y el label a un hbox para que ambos esten debajo de la tabla
         hbx_2nodes.getChildren().addAll(btn_increaseAvaibility, lbl_unselected_row, lbl_success_row);
         gpn_viewMaterial.add(hbx_2nodes, 1, 3);
         btn_increaseAvaibility.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                
+
                 AudioVisual av1 = tvw_viewAudiovisual.getSelectionModel().getSelectedItem();
-                
-                if(av1 != null){
-                    
+
+                if (av1 != null) {
+
                     lbl_unselected_row.setVisible(false);
                     //ventana de alerta para ingresar el aumento de disponibilidad
                     List<String> choices = new ArrayList<>();
@@ -544,41 +550,39 @@ public class InterfaceModules {
                     choices.add("8");
                     choices.add("9");
                     choices.add("10");
-                    
+
                     ChoiceDialog<String> dialog = new ChoiceDialog<>("1", choices);
-                    dialog.setTitle("Disponibilidad");
-                    dialog.setHeaderText("Ingrese el aumento de AudioVisuales");
-                    dialog.setContentText("Cantidad");
-                    
+                    dialog.setTitle("Availability");
+                    dialog.setHeaderText("Enter the increase of AudioVisuals");
+                    dialog.setContentText("Quantity");
+
                     // obtener el valor.
                     Optional<String> result = dialog.showAndWait();
-                    if (result.isPresent()){
+                    if (result.isPresent()) {
                         try {
                             AudioVisualFile avf = new AudioVisualFile(new File("./AudioVisual.dat"));
-                            
+
                             int quanty = Integer.parseInt(result.get());
-                            if(avf.avaibilityAudioVisual(av1.getSignature(),quanty)){
+                            if (avf.avaibilityAudioVisual(av1.getSignature(), quanty)) {
                                 ObservableList<AudioVisual> audioVisuals = avf.getAudioVisuals();
                                 tvw_viewAudiovisual.setItems(audioVisuals);
                                 lbl_success_row.setVisible(true);
-                            }else{
-                                
+                            } else {
+
                             }
                         } catch (IOException ex) {
                             Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        
-                        
+
                     }
                 } else { //si no selecciono nada en la tabla
                     lbl_unselected_row.setVisible(true);
                     lbl_success_row.setVisible(false);
                 }
-            
-        }
+
+            }
         });
 
-        
         //TableView que muestra materiales: libros
         TableView<Books> tvw_viewBooks = new TableView();
 
@@ -586,31 +590,31 @@ public class InterfaceModules {
         ObservableList<Books> datos = bfile.getBooks();
         tvw_viewBooks.setItems(datos);
 
-        TableColumn nameBColumn = new TableColumn("Nombre");
+        TableColumn nameBColumn = new TableColumn("Name");
         nameBColumn.setMinWidth(150);
         nameBColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-        TableColumn authorBColumn = new TableColumn("Autor");
+        TableColumn authorBColumn = new TableColumn("Author");
         authorBColumn.setMinWidth(150);
         authorBColumn.setCellValueFactory(new PropertyValueFactory<>("autor"));
 
-        TableColumn signatureBColumn = new TableColumn("Signatura");
+        TableColumn signatureBColumn = new TableColumn("Signature");
         signatureBColumn.setMinWidth(150);
         signatureBColumn.setCellValueFactory(new PropertyValueFactory<>("signature"));
 
-        TableColumn genreBColumn = new TableColumn("Género");
+        TableColumn genreBColumn = new TableColumn("Genre");
         genreBColumn.setMinWidth(150);
         genreBColumn.setCellValueFactory(new PropertyValueFactory<>("genre"));
 
-        TableColumn lenguageBColumn = new TableColumn("Idioma");
+        TableColumn lenguageBColumn = new TableColumn("Idiom");
         lenguageBColumn.setMinWidth(150);
         lenguageBColumn.setCellValueFactory(new PropertyValueFactory<>("language"));
 
-        TableColumn availabilityBColumn = new TableColumn("Disponibilidad");
+        TableColumn availabilityBColumn = new TableColumn("Availability");
         availabilityBColumn.setMinWidth(10);
         availabilityBColumn.setCellValueFactory(new PropertyValueFactory<>("availability"));
 
-        TableColumn descriptionBColumn = new TableColumn("Descripción");
+        TableColumn descriptionBColumn = new TableColumn("Description");
         descriptionBColumn.setMinWidth(220);
         descriptionBColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
 
@@ -618,36 +622,35 @@ public class InterfaceModules {
                 lenguageBColumn, availabilityBColumn, descriptionBColumn);
         tvw_viewBooks.setPrefSize(1100, 475);
         gpn_viewMaterial.add(tvw_viewBooks, 1, 1);
-        
-        
+
         HBox hbx_2nodesB = new HBox();
         hbx_2nodesB.setSpacing(10);
-        
+
         //label por si no selecciono un item en la tabla
-        Label lbl_unselected_rowB = new Label("No ha seleccionado un ejemplar");
+        Label lbl_unselected_rowB = new Label("You have not selected any article");
         lbl_unselected_rowB.setVisible(false);
         lbl_unselected_rowB.setTextFill(Color.RED);
         lbl_unselected_rowB.setFont(Font.font("Arial", FontWeight.BOLD, 15));
-        
+
         //exito al ingresar ejemplares
         Label lbl_success_rowB = new Label("Increased succesfully!");
         lbl_success_rowB.setVisible(false);
         lbl_success_rowB.setTextFill(Color.GREEN);
         lbl_success_rowB.setFont(Font.font("Arial", FontWeight.BOLD, 15));
-        
+
         //inrementalibros
-        Button btn_increaseAvaibilityB = new Button("Aumentar disponibilidad");
+        Button btn_increaseAvaibilityB = new Button("Increase availability");
         btn_increaseAvaibilityB.setVisible(true);
         btn_increaseAvaibilityB.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                
+
                 Books book1 = tvw_viewBooks.getSelectionModel().getSelectedItem();
-                
-                if(book1 != null){
-                    
+
+                if (book1 != null) {
+
                     lbl_unselected_rowB.setVisible(false);
-                    
+
                     //ventana de alerta para ingresar el aumento de disponibilidad
                     List<String> choices = new ArrayList<>();
                     choices.add("1");
@@ -660,57 +663,56 @@ public class InterfaceModules {
                     choices.add("8");
                     choices.add("9");
                     choices.add("10");
-                    
+
                     ChoiceDialog<String> dialog = new ChoiceDialog<>("1", choices);
-                    dialog.setTitle("Disponibilidad");
-                    dialog.setHeaderText("Ingrese el aumento de libros");
-                    dialog.setContentText("Cantidad");
-                    
+                    dialog.setTitle("Availability");
+                    dialog.setHeaderText("Enter the increase of AudioVisuals");
+                    dialog.setContentText("Quantity");
+
                     // obtener el valor.
                     Optional<String> result = dialog.showAndWait();
-                    if (result.isPresent()){
-                        
-                            
+                    if (result.isPresent()) {
+
                         try {
                             int quanty = Integer.parseInt(result.get());
-                            if(bfile.avaibilityBook(book1.getSignature(),quanty)){
+                            if (bfile.avaibilityBook(book1.getSignature(), quanty)) {
                                 ObservableList<Books> books = bfile.getBooks();
                                 tvw_viewBooks.setItems(books);
                                 lbl_success_rowB.setVisible(true);
-                            }else{
-                                
+                            } else {
+
                             }
                         } catch (IOException ex) {
                             Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        
+
                     }
                 } else { //si no selecciono nada en la columna
                     lbl_unselected_rowB.setVisible(true);
                     lbl_success_rowB.setVisible(false);
                 }
-            
-        }
+
+            }
         });
-        
+
         //se annaden el boton y el label para que deja debajo de la tabla
         hbx_2nodesB.getChildren().addAll(btn_increaseAvaibilityB, lbl_unselected_rowB, lbl_success_rowB);
         gpn_viewMaterial.add(hbx_2nodesB, 1, 3);
-        
-        Label lbl_titleBooks = new Label("Libros");
+
+        Label lbl_titleBooks = new Label("Books");
         lbl_titleBooks.setFont(Font.font("Opens Sans"));
         lbl_titleBooks.setStyle("-fx-font-weight: bold; -fx-font-size: 25");
         gpn_viewMaterial.add(lbl_titleBooks, 1, 2);
-        
+
         Label lbl_titleAudioVisuals = new Label("AudioVisuales");
         lbl_titleAudioVisuals.setVisible(false);
         lbl_titleAudioVisuals.setFont(Font.font("Opens Sans"));
         lbl_titleAudioVisuals.setStyle("-fx-font-weight: bold; -fx-font-size: 25");
         gpn_viewMaterial.add(lbl_titleAudioVisuals, 1, 2);
-        
+
         btn_increaseAvaibility.setVisible(true);
 
-        Button btn_viewBooks = new Button("Ver libros");
+        Button btn_viewBooks = new Button("View books");
         btn_viewBooks.setOnAction((event) -> {
             tvw_viewAudiovisual.setVisible(false);
             lbl_titleAudioVisuals.setVisible(false);
@@ -725,7 +727,7 @@ public class InterfaceModules {
         });
         gpn_viewMaterial.add(btn_viewBooks, 0, 0);
 
-        Button btn_viewAudiov = new Button("Ver Audiovisual");
+        Button btn_viewAudiov = new Button("View Audiovisual");
         btn_viewAudiov.setOnAction((event) -> {
             tvw_viewBooks.setVisible(false);
             lbl_titleBooks.setVisible(false);
@@ -739,14 +741,12 @@ public class InterfaceModules {
             lbl_unselected_rowB.setVisible(false);
         });
         gpn_viewMaterial.add(btn_viewAudiov, 1, 0);
-        
-        
 
         return gpn_viewMaterial;
 
     }
 
-   public static GridPane enterLoan() throws IOException {
+    public static GridPane enterLoan() throws IOException {
 
         LoanFile lFile = new LoanFile(new File("./Loans.dat"));
 
@@ -769,27 +769,27 @@ public class InterfaceModules {
         gpn_enterLoan.setPadding(new Insets(20));
         gpn_enterLoan.setPrefSize(300, 300);
 
-        lbl_idStudent = new Label("Carné del Estudiante");
+        lbl_idStudent = new Label("Student ID");
         lbl_idStudent.setTextFill(Color.BLACK);
         lbl_idStudent.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterLoan.add(lbl_idStudent, 0, 3);
-        
-        Label lbl_exception= new Label("Estudiante no encontrado");
+
+        Label lbl_exception = new Label("Student not found");
         lbl_exception.setTextFill(Color.RED);
         lbl_exception.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         lbl_exception.setVisible(false);
         gpn_enterLoan.add(lbl_exception, 1, 4);
 
         tfd_idStudent = new TextField();
-        
+
         tfd_idStudent.setOnAction((event) -> {
             try {
-                LogicalMethods methods= new LogicalMethods();
-                if(!methods.checkStudentRecord(tfd_idStudent.getText())){
+                LogicalMethods methods = new LogicalMethods();
+                if (!methods.checkStudentRecord(tfd_idStudent.getText())) {
                     tfd_idStudent.clear();
                     lbl_exception.setVisible(true);
                     btn_checkStudent.setDisable(true);
-                }else{
+                } else {
                     btn_checkStudent.setDisable(false);
                     lbl_exception.setVisible(false);
                 }
@@ -797,18 +797,18 @@ public class InterfaceModules {
                 Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
-            }            
+            }
         });
-        
+
         gpn_enterLoan.add(tfd_idStudent, 1, 3);
 
-        Label lbl_notValue = new Label("Ingresar un valor");
+        Label lbl_notValue = new Label("Enter a value");
         lbl_notValue.setVisible(false);
         lbl_notValue.setTextFill(Color.RED);
         lbl_notValue.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterLoan.add(lbl_notValue, 2, 4, 3, 4);
 
-        btn_checkStudent = new Button("Ingresar");
+        btn_checkStudent = new Button("Enter");
         btn_checkStudent.setOnAction((event) -> {
 
             if (tfd_idStudent.getText().length() == 0) {
@@ -828,13 +828,7 @@ public class InterfaceModules {
         });//end Button
         gpn_enterLoan.add(btn_checkStudent, 3, 3);
 
-        lbl_choise = new Label("Seleccione una opción");
-        lbl_choise.setVisible(false);
-        lbl_choise.setTextFill(Color.BLACK);
-        lbl_choise.setFont(Font.font("Arial", FontWeight.BOLD, 15));
-        gpn_enterLoan.add(lbl_choise, 0, 0);
-
-        lbl_signature = new Label("Signatura del Artículo");
+        lbl_signature = new Label("Article Signature");
         lbl_signature.setVisible(false);
         lbl_signature.setTextFill(Color.BLACK);
         lbl_signature.setFont(Font.font("Arial", FontWeight.BOLD, 15));
@@ -844,7 +838,7 @@ public class InterfaceModules {
         tfd_signatureB.setVisible(false);
         gpn_enterLoan.add(tfd_signatureB, 1, 2);
 
-        lbl_deliveryDay = new Label("Día de Entrega");
+        lbl_deliveryDay = new Label("Delivery day");
         lbl_deliveryDay.setVisible(false);
         lbl_deliveryDay.setTextFill(Color.BLACK);
         lbl_deliveryDay.setFont(Font.font("Arial", FontWeight.BOLD, 15));
@@ -873,34 +867,35 @@ public class InterfaceModules {
         });
 
 //        Metodo para deshabilitar los dias anteriores al actual
-        final Callback<DatePicker, DateCell> dayCellFactory
-                = new Callback<DatePicker, DateCell>() {
-            @Override
-            public DateCell call(final DatePicker datePicker) {
-                return new DateCell() {
-                    @Override
-                    public void updateItem(LocalDate item, boolean empty) {
-                        super.updateItem(item, empty);
-
-                        if (item.isBefore(dpk_loanDay.getValue().plusDays(-1))) {
-                            setDisable(true);
-                            setStyle("-fx-background-color: #ffc0cb;");
-                        }
-                    }
-                };
-            }
-        };
-        dpk_delivaeyDay.setDayCellFactory(dayCellFactory);
-        dpk_delivaeyDay.setValue(dpk_loanDay.getValue().plusDays(0));
+        //Desabilidado por motivos de pruebas a la hora de la defensa
+//        final Callback<DatePicker, DateCell> dayCellFactory
+//                = new Callback<DatePicker, DateCell>() {
+//            @Override
+//            public DateCell call(final DatePicker datePicker) {
+//                return new DateCell() {
+//                    @Override
+//                    public void updateItem(LocalDate item, boolean empty) {
+//                        super.updateItem(item, empty);
+//
+//                        if (item.isBefore(dpk_loanDay.getValue().plusDays(-1))) {
+//                            setDisable(true);
+//                            setStyle("-fx-background-color: #ffc0cb;");
+//                        }
+//                    }
+//                };
+//            }
+//        };
+//        dpk_delivaeyDay.setDayCellFactory(dayCellFactory);
+//        dpk_delivaeyDay.setValue(dpk_loanDay.getValue().plusDays(0));
         gpn_enterLoan.add(dpk_delivaeyDay, 4, 2);
 
-        lbl_warning = new Label("Prestamo no registrado");
+        lbl_warning = new Label("¡Unregistered loan!");
         lbl_warning.setVisible(false);
         lbl_warning.setTextFill(Color.RED);
         lbl_warning.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterLoan.add(lbl_warning, 3, 4, 4, 6);
 
-        lbl_success = new Label("Se registro el prestamo");
+        lbl_success = new Label("¡The loan was registered!");
         lbl_success.setVisible(false);
         lbl_success.setTextFill(Color.GREEN);
         lbl_success.setFont(Font.font("Arial", FontWeight.BOLD, 15));
@@ -908,7 +903,7 @@ public class InterfaceModules {
 
         ToggleGroup group = new ToggleGroup();
 
-        rdb_choiceBook = new RadioButton("Libro");
+        rdb_choiceBook = new RadioButton("Book");
         rdb_choiceBook.setVisible(false);
         rdb_choiceBook.setToggleGroup(group);
         rdb_choiceBook.setOnAction(new EventHandler<ActionEvent>() {
@@ -924,15 +919,15 @@ public class InterfaceModules {
                     dpk_delivaeyDay.setVisible(true);
                     btn_enterLoan.setVisible(true);
                     btn_exit.setVisible(true);
-                    
+
                     //tfd_signatureB.setText("ISBN-");
-                    LogicalMethods methods= new LogicalMethods();
-                    String options[]= methods.autocompleteOptions();
+                    LogicalMethods methods = new LogicalMethods();
+                    String options[] = methods.autocompleteOptions();
                     TextFields.bindAutoCompletion(tfd_signatureB, options);
-                    
-                    btn_enterLoan.setDisable(true);                                       
+
+                    btn_enterLoan.setDisable(true);
                     dpk_delivaeyDay.setValue(LocalDate.now());
-                    
+
                 } catch (IOException ex) {
                     Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -980,17 +975,17 @@ public class InterfaceModules {
         });
         gpn_enterLoan.add(rdb_choiceAV, 1, 1);
 
-        lbl_info = new Label("Salir para realizar otro prestamo");
+        lbl_info = new Label("Exit");
         lbl_info.setVisible(false);
         gpn_enterLoan.add(lbl_info, 2, 6, 3, 6);
 
-        Label lbl_notValueEnter = new Label("Llenar todos lo espacios");
+        Label lbl_notValueEnter = new Label("Fill all spaces");
         lbl_notValueEnter.setVisible(false);
         lbl_notValueEnter.setTextFill(Color.RED);
         lbl_notValueEnter.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterLoan.add(lbl_notValueEnter, 3, 4, 4, 6);
 
-        btn_enterLoan = new Button("Ingresar Prestamo");
+        btn_enterLoan = new Button("Enter Loan");
         btn_enterLoan.setVisible(false);
         btn_enterLoan.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -1012,7 +1007,7 @@ public class InterfaceModules {
                         kind = "Audiovisual";
                         loan1 = new Loan(idStudent, signatureAV, loanDay, deliveryDay, kind);
                     } else {
-                        kind = "Libro";
+                        kind = "Book";
                         loan1 = new Loan(idStudent, signatureB, loanDay, deliveryDay, kind);
                     }
                     try {
@@ -1047,33 +1042,33 @@ public class InterfaceModules {
         btn_exit = new Button("Salir");
         btn_exit.setVisible(false);
         btn_exit.setOnAction((event) -> {
-            
-//            lbl_signature.setVisible(false);
-//            tfd_signatureB.setVisible(false);
-//            lbl_deliveryDay.setVisible(false);
-//            dpk_delivaeyDay.setVisible(false);
-//            lbl_choise.setVisible(false);
-//            rdb_choiceBook.setVisible(false);
-//            rdb_choiceAV.setVisible(false);
-//            btn_enterLoan.setVisible(false);
-//            lbl_warning.setVisible(false);
-//            lbl_success.setVisible(false);
-//            lbl_info.setVisible(false);
-//            btn_exit.setVisible(false);
-//            tfd_signatureAV.setVisible(false);
-//            lbl_idStudent.setVisible(true);
-//            tfd_idStudent.setVisible(true);
-//            btn_checkStudent.setVisible(true);
-//            tfd_idStudent.setText("");
-//            tfd_signatureAV.setText("");
-//            tfd_signatureB.setText("");
-//            dpk_delivaeyDay.setValue(LocalDate.now());
-//            tfd_signatureB.setDisable(false);
-//            tfd_signatureAV.setDisable(false);
-//            dpk_delivaeyDay.setDisable(false);
-//            rdb_choiceBook.setDisable(false);
-//            rdb_choiceAV.setDisable(false);
-//            btn_enterLoan.setDisable(false);
+
+            lbl_signature.setVisible(false);
+            tfd_signatureB.setVisible(false);
+            lbl_deliveryDay.setVisible(false);
+            dpk_delivaeyDay.setVisible(false);
+            lbl_choise.setVisible(false);
+            rdb_choiceBook.setVisible(false);
+            rdb_choiceAV.setVisible(false);
+            btn_enterLoan.setVisible(false);
+            lbl_warning.setVisible(false);
+            lbl_success.setVisible(false);
+            lbl_info.setVisible(false);
+            btn_exit.setVisible(false);
+            tfd_signatureAV.setVisible(false);
+            lbl_idStudent.setVisible(true);
+            tfd_idStudent.setVisible(true);
+            btn_checkStudent.setVisible(true);
+            tfd_idStudent.setText("");
+            tfd_signatureAV.setText("");
+            tfd_signatureB.setText("");
+            dpk_delivaeyDay.setValue(LocalDate.now());
+            tfd_signatureB.setDisable(false);
+            tfd_signatureAV.setDisable(false);
+            dpk_delivaeyDay.setDisable(false);
+            rdb_choiceBook.setDisable(false);
+            rdb_choiceAV.setDisable(false);
+            btn_enterLoan.setDisable(false);
         });
         gpn_enterLoan.add(btn_exit, 4, 6);
 
@@ -1103,24 +1098,24 @@ public class InterfaceModules {
         gpn_deleteLoan.setPadding(new Insets(20));
         gpn_deleteLoan.setPrefSize(300, 300);
 
-        Label lbl_signatLoan = new Label("Signatura");
+        Label lbl_signatLoan = new Label("Signature");
         gpn_deleteLoan.add(lbl_signatLoan, 0, 2);
 
         TextField tfd_signatLoan = new TextField();
         gpn_deleteLoan.add(tfd_signatLoan, 1, 2);
 
-        Label lbl_idLoan = new Label("Carné estudiante");
+        Label lbl_idLoan = new Label("ID Student");
         gpn_deleteLoan.add(lbl_idLoan, 3, 2);
 
-        TextField tfd_idLoan = new TextField();        
+        TextField tfd_idLoan = new TextField();
         gpn_deleteLoan.add(tfd_idLoan, 4, 2);
 
-        Label lbl_warningL = new Label("Prestamo no resgistrado");
+        Label lbl_warningL = new Label("Unregistered loan");
         lbl_warningL.setVisible(false);
         lbl_warningL.setTextFill(Color.RED);
         gpn_deleteLoan.add(lbl_warningL, 4, 3);
 
-        Label lbl_loans = new Label("Prestamo");
+        Label lbl_loans = new Label("Loan");
         lbl_loans.setVisible(false);
         gpn_deleteLoan.add(lbl_loans, 0, 0);
 
@@ -1144,7 +1139,7 @@ public class InterfaceModules {
         lbl_kindL.setTextFill(Color.BROWN);
         gpn_deleteLoan.add(lbl_kindL, 5, 1);
 
-        Label lbl_payL = new Label("Pago");
+        Label lbl_payL = new Label("Payment");
         lbl_payL.setVisible(false);
         gpn_deleteLoan.add(lbl_payL, 0, 2);
 
@@ -1152,7 +1147,7 @@ public class InterfaceModules {
         lbl_payLoan.setTextFill(Color.BROWN);
         gpn_deleteLoan.add(lbl_payLoan, 1, 2, 3, 3);
 
-        Button btn_search = new Button("Buscar");
+        Button btn_search = new Button("Search");
         btn_search.setOnAction((ActionEvent event) -> {
 
             signature = tfd_signatLoan.getText().replaceAll(" ", "");
@@ -1171,11 +1166,11 @@ public class InterfaceModules {
                     tfd_idLoan.setVisible(false);
                     btn_search.setVisible(false);
                     lbl_loans.setVisible(true);
-                    lbl_idStudentL.setText("Carné: " + lfile.getLoan(lfile.searchLoan(signature)).getStudentId());
-                    lbl_signatureL.setText("Signatura: " + lfile.getLoan(lfile.searchLoan(signature)).getSignature());
-                    lbl_loanDayL.setText("Día de prestamo: " + lfile.getLoan(lfile.searchLoan(signature)).getLoanDay());
-                    lbl_deliveyDayL.setText("Día de devolución: " + lfile.getLoan(lfile.searchLoan(signature)).getDeliveryDay());
-                    lbl_kindL.setText("Articulo: " + lfile.getLoan(lfile.searchLoan(signature)).getKind());
+                    lbl_idStudentL.setText("ID: " + lfile.getLoan(lfile.searchLoan(signature)).getStudentId());
+                    lbl_signatureL.setText("Signature: " + lfile.getLoan(lfile.searchLoan(signature)).getSignature());
+                    lbl_loanDayL.setText("Loan day: " + lfile.getLoan(lfile.searchLoan(signature)).getLoanDay());
+                    lbl_deliveyDayL.setText("Delivery day: " + lfile.getLoan(lfile.searchLoan(signature)).getDeliveryDay());
+                    lbl_kindL.setText("Article: " + lfile.getLoan(lfile.searchLoan(signature)).getKind());
                     lbl_payL.setVisible(true);
                     btn_delete.setVisible(true);
 
@@ -1193,9 +1188,9 @@ public class InterfaceModules {
                     long balance = lfile.numberOfDays(value1, value2, value3, day, month, year);
 
                     if (balance >= 365) {
-                        lbl_payLoan.setText("Sin morosidades");
+                        lbl_payLoan.setText("Without defaults");
                     } else {
-                        lbl_payLoan.setText(lfile.fineOfPayment(balance) + " colones por " + balance + " dias retrasados");
+                        lbl_payLoan.setText(lfile.fineOfPayment(balance) + " colones for " + balance + " days of delay");
                     }
 
                 }
@@ -1207,12 +1202,12 @@ public class InterfaceModules {
         );
         gpn_deleteLoan.add(btn_search, 5, 4);
 
-        Label lbl_successL = new Label("Se ha eliminado con exito");
+        Label lbl_successL = new Label("It has been removed successfully");
         lbl_successL.setTextFill(Color.GREEN);
         lbl_successL.setVisible(false);
         gpn_deleteLoan.add(lbl_successL, 4, 5, 5, 5);
 
-        btn_delete = new Button("Eliminar");
+        btn_delete = new Button("Delete");
         btn_delete.setVisible(false);
         btn_delete.setOnAction(
                 (event) -> {
@@ -1240,7 +1235,7 @@ public class InterfaceModules {
         );
         gpn_deleteLoan.add(btn_delete, 5, 4);
 
-        btn_exitLoan = new Button("Salir");
+        btn_exitLoan = new Button("Exit");
         btn_exitLoan.setVisible(false);
         btn_exitLoan.setOnAction((event) -> {
 
@@ -1288,23 +1283,23 @@ public class InterfaceModules {
         ObservableList<Loan> data = lfile.getAllLoans();
         tvw_viewLoan.setItems(data);
 
-        TableColumn idColumn = new TableColumn("Carné");
+        TableColumn idColumn = new TableColumn("ID Student");
         idColumn.setMinWidth(150);
         idColumn.setCellValueFactory(new PropertyValueFactory<>("studentId"));
 
-        TableColumn signatureColumn = new TableColumn("Signatura");
+        TableColumn signatureColumn = new TableColumn("Signature");
         signatureColumn.setMinWidth(150);
         signatureColumn.setCellValueFactory(new PropertyValueFactory<>("signature"));
 
-        TableColumn loanDayColumn = new TableColumn("Día de prestamo");
+        TableColumn loanDayColumn = new TableColumn("Loan Day");
         loanDayColumn.setMinWidth(150);
         loanDayColumn.setCellValueFactory(new PropertyValueFactory<>("loanDay"));
 
-        TableColumn deliveryColumn = new TableColumn("Dia de devolución");
+        TableColumn deliveryColumn = new TableColumn("Delivery Day");
         deliveryColumn.setMinWidth(150);
         deliveryColumn.setCellValueFactory(new PropertyValueFactory<>("deliveryDay"));
 
-        TableColumn kindColumn = new TableColumn("Artículo");
+        TableColumn kindColumn = new TableColumn("Article");
         kindColumn.setMinWidth(150);
         kindColumn.setCellValueFactory(new PropertyValueFactory<>("kind"));
 
