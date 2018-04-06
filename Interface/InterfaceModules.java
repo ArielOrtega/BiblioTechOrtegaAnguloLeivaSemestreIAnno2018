@@ -77,6 +77,7 @@ public class InterfaceModules {
     static String signatureB, signatureAV, signature, idLoan;
     static MainInterface mI = new MainInterface();
     StudentFile sft= new StudentFile();
+    File file = new File("studentFile.txt");
     
 
     public GridPane studentRegister() {
@@ -110,15 +111,26 @@ public class InterfaceModules {
                         cb_career.getValue(), "metodo", methods.getStudentId(cb_career.getValue(), tf_entryYear.getText(), arrayListStudent.size()));
 
                 observableArrayStudent.add(s);
-                arrayListStudent.add(s);
+                
+                if(file.exists())
+                sft.serializeList(s);
+                else
+                sft.serializeStudent(s);
+                 
+                //arrayListStudent.add(s);
 
                 tf_name.clear();
                 tf_entryYear.clear();
+                
             }
             }catch(NumberFormatException nfe){
                 lbl_exception.setVisible(true);
                 tf_name.clear();
                 tf_entryYear.clear();
+            } catch (IOException ex) {
+                Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
             }
             
         });
@@ -158,22 +170,19 @@ public class InterfaceModules {
         table.setItems(observableArrayStudent);
         table.setEditable(false);
 
-        Button btn_addToFile= new Button("Añadir al archivo");
-        btn_addToFile.setOnAction((event) -> {
-            sft.writeFile(arrayListStudent);
-        });
-        
         Button btn_showRecords= new Button("Ver Registros");
         btn_showRecords.setOnAction((event) -> {
             try {
-                table.setItems(sft.readFile());
+                table.setItems(FXCollections.observableArrayList(sft.readList()));
             } catch (FileNotFoundException | ClassNotFoundException | OptionalDataException ex) {
+                Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
                 Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
         
         HBox hbox_buttons= new HBox();
-        hbox_buttons.getChildren().addAll(btn_addToFile, btn_showRecords);
+        hbox_buttons.getChildren().addAll(btn_showRecords);
 
         VBox vbox = new VBox();
         vbox.getChildren().addAll(table, hbox_buttons);
@@ -785,6 +794,8 @@ public class InterfaceModules {
                     lbl_exception.setVisible(false);
                 }
             } catch (FileNotFoundException | ClassNotFoundException | OptionalDataException ex) {
+                Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
                 Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
             }            
         });

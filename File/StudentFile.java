@@ -2,61 +2,73 @@
 package File;
 
 import Domain.Student;
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OptionalDataException;
 import java.util.ArrayList;
-import java.util.Observable;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import java.util.List;
 
 
 public class StudentFile {
-    String path= "studentFile.txt";
+    String path= "src//";
+    String name= "studentFile.txt";
+    File file= new File(path + name);
     
    
-    public void writeFile(ArrayList<Student> array) {
-               
-        try {
-            try (FileOutputStream fos = new FileOutputStream(path, true)) {
-                ObjectOutputStream oos = new ObjectOutputStream(fos);
-                oos.writeObject(array);
-                oos.writeInt(array.size());
-                oos.close();
-            }
-        } catch (IOException ioe) {
-        }
-        
-    }  
-        
-    public  ObservableList<Student> readFile() throws FileNotFoundException, ClassNotFoundException, OptionalDataException {
+    public void serializeStudent(Student s) throws IOException, ClassNotFoundException {
 
-        ObservableList<Student> arrayStudents= FXCollections.observableArrayList();
-                
-            try (FileInputStream fis = new FileInputStream(path); 
-                ObjectInputStream ois = new ObjectInputStream(fis)) {
-                
-                @SuppressWarnings("unchecked")
-                ArrayList<Student> arraylist = (ArrayList<Student>) ois.readObject();
-       
-                int num= ois.readInt();
-                for (int i = 0; i < num; i++) {
-                    System.out.println(arraylist.get(i));
-                    arrayStudents.add(arraylist.get(i));
-                }
-                System.out.println("\n");
+        File studentFile = new File(path+ name);
 
+        ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(path + name));
+        output.writeUnshared(s);
+        output.close();
 
-         }catch(IOException | ClassNotFoundException ioe){}
-            
-        return arrayStudents;
-        }
+    }
     
-    }    
+    public void serializeList(Student person_) throws IOException, ClassNotFoundException {
+
+        
+        File studentFile = new File(path+ name);
+        List<Student> studentArray = new ArrayList<Student>();
+
+        if (studentFile.exists()) {
+            ObjectInputStream objectInput = new ObjectInputStream(new FileInputStream(path + name));
+            Object aux = objectInput.readObject();
+ 
+            studentArray = (List<Student>) aux;
+            objectInput.close();
+        }
+
+        studentArray.add(person_);
+
+        ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(path + name));
+        output.writeUnshared(studentArray);
+
+        output.close();
+    }
+    
+    public List<Student> readList() throws IOException, ClassNotFoundException {
+
+        File studenFile = new File(path + name);
+        List<Student> studentArray = new ArrayList<Student>();
+
+        
+        if (studenFile.exists()) {
+            ObjectInputStream objectInput = new ObjectInputStream(new FileInputStream(path + name));
+            Object aux = objectInput.readObject();
+
+            System.out.println(aux.toString());
+            studentArray = (List<Student>) aux;
+            objectInput.close();
+        }
+        
+        return studentArray;
+    }
+
+}    
     
     
 
