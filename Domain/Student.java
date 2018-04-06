@@ -10,14 +10,14 @@ public class Student implements Serializable{
     private String name;
     private int entryYear;
     private String career;
-    private String previousLoans;
+    private String phoneNumber;
     private String id;
 
-    public Student(String name, int entryYear, String career, String previousLoans, String id) {
+    public Student(String name, int entryYear, String career, String phoneNumber, String id) {
         this.name = name;
         this.entryYear = entryYear;
         this.career = career;
-        this.previousLoans = previousLoans;
+        this.phoneNumber = phoneNumber;
         this.id = id;
     }
 
@@ -45,12 +45,12 @@ public class Student implements Serializable{
         this.career = career;
     }
 
-    public String getPreviousLoans() {
-        return previousLoans;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setPreviousLoans(String previousLoans) {
-        this.previousLoans = previousLoans;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getId() {
@@ -65,7 +65,7 @@ public class Student implements Serializable{
     @Override
     public String toString() {
         return "Estudiante{" + "nombre=" + name + ", anno de ingreso=" + entryYear + ", carrera=" + career 
-                + "\nprestamos previos=" + previousLoans + ", carne=" + id + '}';
+                + "\nprestamos previos=" + phoneNumber + ", carne=" + id + '}';
     }
     
     

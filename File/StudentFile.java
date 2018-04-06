@@ -4,10 +4,12 @@ package File;
 import Domain.Student;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +30,7 @@ public class StudentFile {
 
     }
     
-    public void serializeList(Student person_) throws IOException, ClassNotFoundException {
+    public void serializeList(Student student) throws IOException, ClassNotFoundException {
 
         
         File studentFile = new File(path+ name);
@@ -42,7 +44,7 @@ public class StudentFile {
             objectInput.close();
         }
 
-        studentArray.add(person_);
+        studentArray.add(student);
 
         ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(path + name));
         output.writeUnshared(studentArray);
@@ -67,6 +69,21 @@ public class StudentFile {
         
         return studentArray;
     }
+    
+    //Retorna la info de estudiante
+    public String studentInfo(String idStudent) throws FileNotFoundException, ClassNotFoundException, OptionalDataException, IOException {
+        String info= "";
+        
+        for (int i = 0; i < readList().size(); i++) {
+            if (readList().get(i).getId().equalsIgnoreCase(idStudent)) {
+                info= "Student Data:\n\nName: "+ readList().get(i).getName()
+                        +"\nEntry year: "+ readList().get(i).getEntryYear()
+                        +"\nCareer: "+ readList().get(i).getCareer()
+                        +"\nPhone Number: "+ readList().get(i).getPhoneNumber();
+            }
+        }//for
+        return info;
+    }    
 
 }    
     

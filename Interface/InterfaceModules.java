@@ -9,6 +9,8 @@ import File.AudioVisualFile;
 import File.BooksFile;
 import File.LoanFile;
 import File.StudentFile;
+import com.sun.javafx.scene.control.skin.TextFieldSkin;
+import com.sun.javafx.scene.control.skin.VirtualFlow;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -46,6 +48,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -87,14 +90,17 @@ public class InterfaceModules {
         Label lbl_name = new Label("Name");
         Label lbl_entryYear = new Label("Entry year");
         Label lbl_exception = new Label("Insert data correctly");
+        Label lbl_phone= new Label("Telephone Number");
         lbl_exception.setVisible(false);
 
         //TextFields
         TextField tf_name = new TextField();
         TextField tf_entryYear = new TextField();
+        TextField tf_phone= new TextField();
 
         tf_name.setPromptText("Name");
         tf_entryYear.setPromptText("Year");;
+        tf_phone.setPromptText("Telephone");
 
         //ComboBox para opciones de carreras existentes
         ComboBox<String> cb_career = new ComboBox<>();
@@ -107,11 +113,16 @@ public class InterfaceModules {
             try {
                 String name = tf_name.getText();
                 int year = Integer.parseInt(tf_entryYear.getText());
+                String phone = tf_phone.getText();
+                String id = methods.getStudentId(cb_career.getValue(), tf_entryYear.getText(), observableArrayStudent.size());
 
-                if (tf_name.getText().length() > 0 && tf_entryYear.getText().length() > 0 && cb_career.getValue().length() > 0) {
-                    Student s = new Student(name, year,
-                            cb_career.getValue(), "metodo", methods.getStudentId(cb_career.getValue(), tf_entryYear.getText(),
-                            arrayListStudent.size()));
+                if (tf_name.getText().length() > 0 && tf_entryYear.getText().length() > 0
+                        && cb_career.getValue().length() > 0 && (tf_phone.getText().length() > 0 && tf_phone.getText().length() < 9)) {
+
+                    //Formato
+                    String format = phone.substring(0, 4) + "-" + phone.substring(4);
+
+                    Student s = new Student(name, year, cb_career.getValue(), format, id);
 
                     //Se añade al obsevable list
                     observableArrayStudent.add(s);
@@ -125,12 +136,18 @@ public class InterfaceModules {
                     //arrayListStudent.add(s);
                     tf_name.clear();
                     tf_entryYear.clear();
-
+                    tf_phone.clear();
+                } else {
+                    lbl_exception.setVisible(true);
+                    tf_name.clear();
+                    tf_entryYear.clear();
+                    tf_phone.clear();
                 }
             } catch (NumberFormatException nfe) {
                 lbl_exception.setVisible(true);
                 tf_name.clear();
                 tf_entryYear.clear();
+                tf_phone.clear();
             } catch (IOException ex) {
                 Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
             } catch (ClassNotFoundException ex) {
@@ -145,8 +162,10 @@ public class InterfaceModules {
         gridpane.add(tf_name, 0, 3);
         gridpane.add(lbl_entryYear, 0, 5);
         gridpane.add(tf_entryYear, 0, 6);
-        gridpane.add(cb_career, 0, 8);
-        gridpane.add(lbl_exception, 0, 9);
+        gridpane.add(lbl_phone, 0, 8);
+        gridpane.add(tf_phone, 0, 9);        
+        gridpane.add(cb_career, 0, 11);    
+        gridpane.add(lbl_exception, 0,12);
         gridpane.setVgap(5);
 
         return gridpane;
@@ -173,14 +192,14 @@ public class InterfaceModules {
         columnCareer.setMinWidth(100);
         columnCareer.setCellValueFactory(new PropertyValueFactory("career"));
 
-        TableColumn columnLoans = new TableColumn("Loans");
-        columnLoans.setMinWidth(100);
-        columnLoans.setCellValueFactory(new PropertyValueFactory("previousLoans"));
+        TableColumn columnTelephone = new TableColumn("Telephone");
+        columnTelephone.setMinWidth(100);
+        columnTelephone.setCellValueFactory(new PropertyValueFactory("phoneNumber"));
         
 //        table.setItems(observableArrayStudent);
 
         //Agregacion de n'odulos a la tabla
-        table.getColumns().addAll(columnId, columnName, columnYear, columnCareer, columnLoans);
+        table.getColumns().addAll(columnId, columnName, columnYear, columnCareer, columnTelephone);
         table.setPrefSize(550, 400);        
         table.setEditable(false);
 
@@ -780,11 +799,18 @@ public class InterfaceModules {
         lbl_exception.setVisible(false);
         gpn_enterLoan.add(lbl_exception, 1, 4);
 
+        Label lbl_studentInfo= new Label();
+        lbl_studentInfo.setTextFill(Color.BLACK);
+        lbl_studentInfo.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        gpn_enterLoan.add(lbl_studentInfo, 0, 3, 2, 4);
+        
         tfd_idStudent = new TextField();
-
+        Tooltip enter= new Tooltip("Presione enter");
+        tfd_idStudent.setTooltip(enter);
         tfd_idStudent.setOnAction((event) -> {
             try {
                 LogicalMethods methods = new LogicalMethods();
+                StudentFile sft = new StudentFile();
                 if (!methods.checkStudentRecord(tfd_idStudent.getText())) {
                     tfd_idStudent.clear();
                     lbl_exception.setVisible(true);
@@ -792,6 +818,7 @@ public class InterfaceModules {
                 } else {
                     btn_checkStudent.setDisable(false);
                     lbl_exception.setVisible(false);
+                    lbl_studentInfo.setText(sft.studentInfo(tfd_idStudent.getText()));
                 }
             } catch (FileNotFoundException | ClassNotFoundException | OptionalDataException ex) {
                 Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
@@ -808,7 +835,9 @@ public class InterfaceModules {
         lbl_notValue.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterLoan.add(lbl_notValue, 2, 4, 3, 4);
 
+        lbl_choise= new Label("Choose material");
         btn_checkStudent = new Button("Enter");
+        btn_checkStudent.setDisable(true);
         btn_checkStudent.setOnAction((event) -> {
 
             if (tfd_idStudent.getText().length() == 0) {
@@ -925,7 +954,7 @@ public class InterfaceModules {
                     String options[] = methods.autocompleteOptions();
                     TextFields.bindAutoCompletion(tfd_signatureB, options);
 
-                    btn_enterLoan.setDisable(true);
+                    btn_enterLoan.setDisable(false);
                     dpk_delivaeyDay.setValue(LocalDate.now());
 
                 } catch (IOException ex) {
