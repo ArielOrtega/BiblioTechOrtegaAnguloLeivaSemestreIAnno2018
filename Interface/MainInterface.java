@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
+import javafx.event.EventType;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
@@ -34,6 +35,7 @@ public class MainInterface extends Application {
         primaryStage.setScene(scene);
         primaryStage.setMinWidth(500);
         primaryStage.setMinHeight(450);
+        primaryStage.setMaximized(true);
         primaryStage.show();
 
     }//fin start
@@ -138,14 +140,17 @@ public class MainInterface extends Application {
         mnu_menuLoans.getItems().addAll(mim_performLoan, mim_deleteLoan, mim_loansView);
 
         MenuBar mnb_mainMenu = new MenuBar();
+        mnb_mainMenu.setStyle("-fx-background-color: white");
         mnb_mainMenu.getMenus().addAll(mnu_menuStudents, mnu_menuMaterials, mnu_menuLoans);
 
         //Despliegue del logo en el programa
-        Image img_logo = new Image(MainInterface.class.getResourceAsStream("/Images/logoBiblioT.png"));
+        Image img_logo = new Image(MainInterface.class.getResourceAsStream("/Images/logoVL.png"));
         ImageView imv_logo = new ImageView();
         imv_logo.setImage(img_logo);
         imv_logo.setFitHeight(170);
-        imv_logo.setFitWidth(300);
+        imv_logo.setFitWidth(1100);
+        
+        vbx_upperSide.setStyle("-fx-background-color: DIMGRAY");
 
         presentador.setPrefSize(scene.getWidth(), scene.getWidth());
 
