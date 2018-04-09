@@ -15,11 +15,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OptionalDataException;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Optional;
@@ -68,9 +70,9 @@ public class InterfaceModules {
     static String genre, idiom;
     static int valueDelivery1, valueDelivery2, valueDelivery3;
     static LocalDate date1;
-    static Label lbl_choise, lbl_signature, lbl_deliveryDay, lbl_warning, lbl_success, lbl_idStudent, lbl_info;
+    static Label lbl_choise, lbl_signature, lbl_deliveryDay, lbl_warning, lbl_success, lbl_idStudent, lbl_info, lbl_nameArticle;
     static RadioButton rdb_choiceBook, rdb_choiceAV;
-    static TextField tfd_signatureB, tfd_idStudent, tfd_signatureAV;
+    static TextField tfd_signatureB, tfd_idStudent, tfd_signatureAV, tfd_nameArticle;
     static DatePicker dpk_delivaeyDay;
     static Button btn_enterLoan, btn_checkStudent, btn_exit, btn_delete, btn_exitLoan;
     static Loan loan1;
@@ -90,17 +92,29 @@ public class InterfaceModules {
         Label lbl_name = new Label("Name");
         Label lbl_entryYear = new Label("Entry year");
         Label lbl_exception = new Label("Insert data correctly");
-        Label lbl_phone= new Label("Telephone Number");
+        Label lbl_phone = new Label("Telephone Number");
         lbl_exception.setVisible(false);
 
         //TextFields
-        TextField tf_name = new TextField();
-        TextField tf_entryYear = new TextField();
-        TextField tf_phone= new TextField();
+        TextField tfd_name = new TextField();
+        TextField tfd_entryYear = new TextField();
+        TextField tfd_phone = new TextField();
 
-        tf_name.setPromptText("Name");
-        tf_entryYear.setPromptText("Year");;
-        tf_phone.setPromptText("Telephone");
+        tfd_name.setPromptText("Name");
+        tfd_entryYear.setPromptText("Year");
+        tfd_entryYear.lengthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable,
+                    Number beforeValue, Number actualValue) {
+                if (actualValue.intValue() > beforeValue.intValue()) {
+                    // Revisa que la longitud del texto no sea mayor a la variable definida.
+                    if (tfd_entryYear.getText().length() >= 5) {
+                        tfd_entryYear.setText(tfd_entryYear.getText().substring(0, 5));
+                    }
+                }
+            }
+        });
+        tfd_phone.setPromptText("Telephone");
 
         //ComboBox para opciones de carreras existentes
         ComboBox<String> cb_career = new ComboBox<>();
@@ -111,13 +125,13 @@ public class InterfaceModules {
         //Funcion del ComboBox
         cb_career.setOnAction((event) -> {
             try {
-                String name = tf_name.getText();
-                int year = Integer.parseInt(tf_entryYear.getText());
-                String phone = tf_phone.getText();
-                String id = methods.getStudentId(cb_career.getValue(), tf_entryYear.getText(), observableArrayStudent.size());
+                String name = tfd_name.getText();
+                int year = Integer.parseInt(tfd_entryYear.getText());
+                String phone = tfd_phone.getText();
+                String id = methods.getStudentId(cb_career.getValue(), tfd_entryYear.getText(), observableArrayStudent.size());
 
-                if (tf_name.getText().length() > 0 && tf_entryYear.getText().length() > 0
-                        && cb_career.getValue().length() > 0 && (tf_phone.getText().length() > 0 && tf_phone.getText().length() < 9)) {
+                if (tfd_name.getText().length() > 0 && tfd_entryYear.getText().length() > 0
+                        && cb_career.getValue().length() > 0 && (tfd_phone.getText().length() > 0 && tfd_phone.getText().length() < 9)) {
 
                     //Formato
                     String format = phone.substring(0, 4) + "-" + phone.substring(4);
@@ -134,20 +148,20 @@ public class InterfaceModules {
                     }
 
                     //arrayListStudent.add(s);
-                    tf_name.clear();
-                    tf_entryYear.clear();
-                    tf_phone.clear();
+                    tfd_name.clear();
+                    tfd_entryYear.clear();
+                    tfd_phone.clear();
                 } else {
                     lbl_exception.setVisible(true);
-                    tf_name.clear();
-                    tf_entryYear.clear();
-                    tf_phone.clear();
+                    tfd_name.clear();
+                    tfd_entryYear.clear();
+                    tfd_phone.clear();
                 }
             } catch (NumberFormatException nfe) {
                 lbl_exception.setVisible(true);
-                tf_name.clear();
-                tf_entryYear.clear();
-                tf_phone.clear();
+                tfd_name.clear();
+                tfd_entryYear.clear();
+                tfd_phone.clear();
             } catch (IOException ex) {
                 Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
             } catch (ClassNotFoundException ex) {
@@ -159,13 +173,13 @@ public class InterfaceModules {
         //Agregación de los nodulos al GridPane que se retorna
         gridpane.add(lbl_title, 0, 0);
         gridpane.add(lbl_name, 0, 2);
-        gridpane.add(tf_name, 0, 3);
+        gridpane.add(tfd_name, 0, 3);
         gridpane.add(lbl_entryYear, 0, 5);
-        gridpane.add(tf_entryYear, 0, 6);
+        gridpane.add(tfd_entryYear, 0, 6);
         gridpane.add(lbl_phone, 0, 8);
-        gridpane.add(tf_phone, 0, 9);        
-        gridpane.add(cb_career, 0, 11);    
-        gridpane.add(lbl_exception, 0,12);
+        gridpane.add(tfd_phone, 0, 9);
+        gridpane.add(cb_career, 0, 11);
+        gridpane.add(lbl_exception, 0, 12);
         gridpane.setVgap(5);
 
         return gridpane;
@@ -195,12 +209,11 @@ public class InterfaceModules {
         TableColumn columnTelephone = new TableColumn("Telephone");
         columnTelephone.setMinWidth(100);
         columnTelephone.setCellValueFactory(new PropertyValueFactory("phoneNumber"));
-        
-//        table.setItems(observableArrayStudent);
 
+//        table.setItems(observableArrayStudent);
         //Agregacion de n'odulos a la tabla
         table.getColumns().addAll(columnId, columnName, columnYear, columnCareer, columnTelephone);
-        table.setPrefSize(550, 400);        
+        table.setPrefSize(550, 400);
         table.setEditable(false);
 
         //Bot'on para mostrar la lista de estudiantes
@@ -214,7 +227,7 @@ public class InterfaceModules {
                 Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
-        
+
         HBox hbox_buttons = new HBox();
         hbox_buttons.getChildren().addAll(btn_showRecords);
 
@@ -768,6 +781,8 @@ public class InterfaceModules {
     public static GridPane enterLoan() throws IOException {
 
         LoanFile lFile = new LoanFile(new File("./Loans.dat"));
+        AudioVisualFile avfile = new AudioVisualFile(new File("./AudioVisual.dat"));
+        BooksFile bfile = new BooksFile(new File("./Books.dat"));
 
         GridPane gpn_enterLoan = new GridPane();
 
@@ -789,7 +804,7 @@ public class InterfaceModules {
         gpn_enterLoan.setPrefSize(300, 300);
 
         lbl_idStudent = new Label("Student ID");
-        lbl_idStudent.setTextFill(Color.BLACK);
+        lbl_idStudent.setTextFill(Color.WHITE);
         lbl_idStudent.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterLoan.add(lbl_idStudent, 0, 3);
 
@@ -799,13 +814,13 @@ public class InterfaceModules {
         lbl_exception.setVisible(false);
         gpn_enterLoan.add(lbl_exception, 1, 4);
 
-        Label lbl_studentInfo= new Label();
-        lbl_studentInfo.setTextFill(Color.BLACK);
+        Label lbl_studentInfo = new Label();
+        lbl_studentInfo.setTextFill(Color.WHITE);
         lbl_studentInfo.setFont(Font.font("Arial", FontWeight.BOLD, 15));
-        gpn_enterLoan.add(lbl_studentInfo, 0, 3, 2, 4);
-        
+        gpn_enterLoan.add(lbl_studentInfo, 0, 4, 2, 5);
+
         tfd_idStudent = new TextField();
-        Tooltip enter= new Tooltip("Presione enter");
+        Tooltip enter = new Tooltip("Presione enter");
         tfd_idStudent.setTooltip(enter);
         tfd_idStudent.setOnAction((event) -> {
             try {
@@ -819,11 +834,24 @@ public class InterfaceModules {
                     btn_checkStudent.setDisable(false);
                     lbl_exception.setVisible(false);
                     lbl_studentInfo.setText(sft.studentInfo(tfd_idStudent.getText()));
+                    tfd_idStudent.setDisable(true);
                 }
             } catch (FileNotFoundException | ClassNotFoundException | OptionalDataException ex) {
                 Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
+        tfd_idStudent.lengthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable,
+                    Number beforeValue, Number actualValue) {
+                if (actualValue.intValue() > beforeValue.intValue()) {
+                    // Revisa que la longitud del texto no sea mayor a la variable definida.
+                    if (tfd_idStudent.getText().length() >= 5) {
+                        tfd_idStudent.setText(tfd_idStudent.getText().substring(0, 5));
+                    }
+                }
             }
         });
 
@@ -834,8 +862,6 @@ public class InterfaceModules {
         lbl_notValue.setTextFill(Color.RED);
         lbl_notValue.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterLoan.add(lbl_notValue, 2, 4, 3, 4);
-
-        lbl_choise= new Label("Choose material");
         btn_checkStudent = new Button("Enter");
         btn_checkStudent.setDisable(true);
         btn_checkStudent.setOnAction((event) -> {
@@ -848,7 +874,6 @@ public class InterfaceModules {
                 lbl_idStudent.setVisible(false);
                 tfd_idStudent.setVisible(false);
                 btn_checkStudent.setVisible(false);
-                lbl_choise.setVisible(true);
                 rdb_choiceAV.setVisible(true);
                 rdb_choiceBook.setVisible(true);
 
@@ -857,19 +882,41 @@ public class InterfaceModules {
         });//end Button
         gpn_enterLoan.add(btn_checkStudent, 3, 3);
 
+        lbl_nameArticle = new Label("Name of Article");
+        lbl_nameArticle.setVisible(false);
+        lbl_nameArticle.setTextFill(Color.WHITE);
+        lbl_nameArticle.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        gpn_enterLoan.add(lbl_nameArticle, 0, 3);
+
+        tfd_nameArticle = new TextField();
+        tfd_nameArticle.setVisible(false);
+        gpn_enterLoan.add(tfd_nameArticle, 1, 3);
+
         lbl_signature = new Label("Article Signature");
         lbl_signature.setVisible(false);
-        lbl_signature.setTextFill(Color.BLACK);
+        lbl_signature.setTextFill(Color.WHITE);
         lbl_signature.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterLoan.add(lbl_signature, 0, 2);
 
         tfd_signatureB = new TextField("ISBN-");
         tfd_signatureB.setVisible(false);
         gpn_enterLoan.add(tfd_signatureB, 1, 2);
+        tfd_signatureB.lengthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable,
+                    Number beforeValue, Number actualValue) {
+                if (actualValue.intValue() > beforeValue.intValue()) {
+                    // Revisa que la longitud del texto no sea mayor a la variable definida.
+                    if (tfd_signatureB.getText().length() >= 9) {
+                        tfd_signatureB.setText(tfd_signatureB.getText().substring(0, 9));
+                    }
+                }
+            }
+        });
 
         lbl_deliveryDay = new Label("Delivery day");
         lbl_deliveryDay.setVisible(false);
-        lbl_deliveryDay.setTextFill(Color.BLACK);
+        lbl_deliveryDay.setTextFill(Color.WHITE);
         lbl_deliveryDay.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterLoan.add(lbl_deliveryDay, 3, 2);
 
@@ -933,6 +980,7 @@ public class InterfaceModules {
         ToggleGroup group = new ToggleGroup();
 
         rdb_choiceBook = new RadioButton("Book");
+        rdb_choiceBook.setTextFill(Color.WHITE);
         rdb_choiceBook.setVisible(false);
         rdb_choiceBook.setToggleGroup(group);
         rdb_choiceBook.setOnAction(new EventHandler<ActionEvent>() {
@@ -948,11 +996,13 @@ public class InterfaceModules {
                     dpk_delivaeyDay.setVisible(true);
                     btn_enterLoan.setVisible(true);
                     btn_exit.setVisible(true);
+                    lbl_nameArticle.setVisible(true);
+                    tfd_nameArticle.setVisible(true);
 
                     //tfd_signatureB.setText("ISBN-");
                     LogicalMethods methods = new LogicalMethods();
                     String options[] = methods.autocompleteOptions();
-                    TextFields.bindAutoCompletion(tfd_signatureB, options);
+                    TextFields.bindAutoCompletion(tfd_nameArticle, options);
 
                     btn_enterLoan.setDisable(false);
                     dpk_delivaeyDay.setValue(LocalDate.now());
@@ -983,6 +1033,7 @@ public class InterfaceModules {
         gpn_enterLoan.add(tfd_signatureAV, 1, 2);
 
         rdb_choiceAV = new RadioButton("Audiovisual");
+        rdb_choiceAV.setTextFill(Color.WHITE);        
         rdb_choiceAV.setVisible(false);
         rdb_choiceAV.setToggleGroup(group);
         rdb_choiceAV.setOnAction(new EventHandler<ActionEvent>() {
@@ -999,6 +1050,8 @@ public class InterfaceModules {
                 btn_exit.setVisible(true);
                 tfd_signatureAV.setText("");
                 dpk_delivaeyDay.setValue(LocalDate.now());
+                lbl_nameArticle.setVisible(true);
+                tfd_nameArticle.setVisible(true);
 
             }
         });
@@ -1030,14 +1083,26 @@ public class InterfaceModules {
                     signatureAV = tfd_signatureAV.getText();
                     String loanDay = "" + LocalDate.now();
                     String deliveryDay = "" + date1;
-                    String kind = "";
+                    boolean kind = false;
 
                     if (rdb_choiceAV.isSelected()) {
-                        kind = "Audiovisual";
+                        kind = true;
                         loan1 = new Loan(idStudent, signatureAV, loanDay, deliveryDay, kind);
+                        try {
+                            avfile.lessAvaibilityAudioVisual(signatureAV);
+                            avfile.close();
+                        } catch (IOException ex) {
+                            Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     } else {
-                        kind = "Book";
+                        kind = false;
                         loan1 = new Loan(idStudent, signatureB, loanDay, deliveryDay, kind);
+                        try {
+                            bfile.lessAvaibilityBook(signatureB);
+                            bfile.close();
+                        } catch (IOException ex) {
+                            Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                     try {
 
@@ -1052,6 +1117,9 @@ public class InterfaceModules {
                         rdb_choiceAV.setDisable(true);
                         btn_enterLoan.setDisable(true);
                         lbl_info.setVisible(true);
+                        lbl_studentInfo.setVisible(false);
+                        tfd_nameArticle.setDisable(true);
+                        lbl_success.setVisible(true);
 
                         //Se limpian los valores anteriormente ingresados 
                         tfd_idStudent.setText("");
@@ -1068,15 +1136,15 @@ public class InterfaceModules {
         });
         gpn_enterLoan.add(btn_enterLoan, 4, 4);
 
-        btn_exit = new Button("Salir");
+        btn_exit = new Button("Exit");
         btn_exit.setVisible(false);
         btn_exit.setOnAction((event) -> {
 
+            lbl_notValueEnter.setVisible(false);
             lbl_signature.setVisible(false);
             tfd_signatureB.setVisible(false);
             lbl_deliveryDay.setVisible(false);
             dpk_delivaeyDay.setVisible(false);
-            lbl_choise.setVisible(false);
             rdb_choiceBook.setVisible(false);
             rdb_choiceAV.setVisible(false);
             btn_enterLoan.setVisible(false);
@@ -1098,6 +1166,9 @@ public class InterfaceModules {
             rdb_choiceBook.setDisable(false);
             rdb_choiceAV.setDisable(false);
             btn_enterLoan.setDisable(false);
+            tfd_idStudent.setDisable(false);
+            lbl_nameArticle.setVisible(false);
+            tfd_nameArticle.setVisible(false);
         });
         gpn_enterLoan.add(btn_exit, 4, 6);
 
@@ -1108,6 +1179,8 @@ public class InterfaceModules {
     public static GridPane deleteLoans() throws IOException {
 
         LoanFile lfile = new LoanFile(new File("./Loans.dat"));
+        AudioVisualFile avfile = new AudioVisualFile(new File("./AudioVisual.dat"));
+        BooksFile bfile = new BooksFile(new File("./Books.dat"));
 
         GridPane gpn_deleteLoan = new GridPane();
         gpn_deleteLoan.getColumnConstraints().add(new ColumnConstraints(150));
@@ -1128,12 +1201,16 @@ public class InterfaceModules {
         gpn_deleteLoan.setPrefSize(300, 300);
 
         Label lbl_signatLoan = new Label("Signature");
+        lbl_signatLoan.setTextFill(Color.WHITE);
+        lbl_signatLoan.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_deleteLoan.add(lbl_signatLoan, 0, 2);
 
         TextField tfd_signatLoan = new TextField();
         gpn_deleteLoan.add(tfd_signatLoan, 1, 2);
 
         Label lbl_idLoan = new Label("ID Student");
+        lbl_idLoan.setTextFill(Color.WHITE);
+        lbl_idLoan.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_deleteLoan.add(lbl_idLoan, 3, 2);
 
         TextField tfd_idLoan = new TextField();
@@ -1141,39 +1218,50 @@ public class InterfaceModules {
 
         Label lbl_warningL = new Label("Unregistered loan");
         lbl_warningL.setVisible(false);
+        lbl_warningL.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         lbl_warningL.setTextFill(Color.RED);
         gpn_deleteLoan.add(lbl_warningL, 4, 3);
 
         Label lbl_loans = new Label("Loan");
+        lbl_loans.setTextFill(Color.WHITE);
+        lbl_loans.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         lbl_loans.setVisible(false);
         gpn_deleteLoan.add(lbl_loans, 0, 0);
 
         Label lbl_idStudentL = new Label();
-        lbl_idStudentL.setTextFill(Color.BROWN);
+        lbl_idStudentL.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_idStudentL.setTextFill(Color.FLORALWHITE);
         gpn_deleteLoan.add(lbl_idStudentL, 1, 1);
 
         Label lbl_signatureL = new Label();
-        lbl_signatureL.setTextFill(Color.BROWN);
+        lbl_signatureL.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_signatureL.setTextFill(Color.FLORALWHITE);
         gpn_deleteLoan.add(lbl_signatureL, 2, 1);
 
         Label lbl_loanDayL = new Label();
-        lbl_loanDayL.setTextFill(Color.BROWN);
+        lbl_loanDayL.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_loanDayL.setTextFill(Color.FLORALWHITE);
         gpn_deleteLoan.add(lbl_loanDayL, 3, 1);
 
         Label lbl_deliveyDayL = new Label();
-        lbl_deliveyDayL.setTextFill(Color.BROWN);
+        lbl_deliveyDayL.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_deliveyDayL.setTextFill(Color.FLORALWHITE);
         gpn_deleteLoan.add(lbl_deliveyDayL, 4, 1);
 
         Label lbl_kindL = new Label();
-        lbl_kindL.setTextFill(Color.BROWN);
+        lbl_kindL.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_kindL.setTextFill(Color.FLORALWHITE);
         gpn_deleteLoan.add(lbl_kindL, 5, 1);
 
         Label lbl_payL = new Label("Payment");
+        lbl_payL.setTextFill(Color.WHITE);
+        lbl_payL.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         lbl_payL.setVisible(false);
         gpn_deleteLoan.add(lbl_payL, 0, 2);
 
         Label lbl_payLoan = new Label();
-        lbl_payLoan.setTextFill(Color.BROWN);
+        lbl_payLoan.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_payLoan.setTextFill(Color.FLORALWHITE);
         gpn_deleteLoan.add(lbl_payLoan, 1, 2, 3, 3);
 
         Button btn_search = new Button("Search");
@@ -1187,7 +1275,7 @@ public class InterfaceModules {
                     lbl_warningL.setVisible(true);
 
                 } else {
-
+                    
                     lbl_warningL.setVisible(false);
                     lbl_signatLoan.setVisible(false);
                     tfd_signatLoan.setVisible(false);
@@ -1203,20 +1291,13 @@ public class InterfaceModules {
                     lbl_payL.setVisible(true);
                     btn_delete.setVisible(true);
 
-                    Calendar calendar = new GregorianCalendar();
-                    int year = calendar.get(Calendar.YEAR);
-                    int month = calendar.get(Calendar.MONTH) + 1;
-                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                    LocalDate date = LocalDate.now();
+                    String dateNow = "" +date;
 
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                    LocalDate localDate = LocalDate.parse(lfile.getLoan(lfile.searchDeleteLoan(signature, idLoan)).getDeliveryDay(), formatter);
-                    int value1 = localDate.getDayOfMonth();
-                    int value2 = localDate.getMonthValue();
-                    int value3 = localDate.getYear();
 
-                    long balance = lfile.numberOfDays(value1, value2, value3, day, month, year);
+                    long balance = lfile.numberOfDays(lfile.getLoan(lfile.searchLoan(signature)).getDeliveryDay(), dateNow);
 
-                    if (balance >= 365) {
+                    if (balance < 0) {
                         lbl_payLoan.setText("Without defaults");
                     } else {
                         lbl_payLoan.setText(lfile.fineOfPayment(balance) + " colones for " + balance + " days of delay");
@@ -1224,6 +1305,8 @@ public class InterfaceModules {
 
                 }
             } catch (IOException ex) {
+                Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ParseException ex) {
                 Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
             }
 
@@ -1233,18 +1316,32 @@ public class InterfaceModules {
 
         Label lbl_successL = new Label("It has been removed successfully");
         lbl_successL.setTextFill(Color.GREEN);
+        lbl_successL.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         lbl_successL.setVisible(false);
         gpn_deleteLoan.add(lbl_successL, 4, 5, 5, 5);
-
+        
+        Label lbl_avaibility = new Label();
+        lbl_avaibility.setTextFill(Color.WHITE);
+        lbl_avaibility.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        gpn_deleteLoan.add(lbl_avaibility, 4, 6, 5, 6);
+        
         btn_delete = new Button("Delete");
         btn_delete.setVisible(false);
         btn_delete.setOnAction(
                 (event) -> {
 
                     try {
+                        //si la condicion se satisface es porque el articulo pertenece a Audiovisuales
+                        if(lfile.getLoan(lfile.searchLoan(signature)).getKind()){                            
+                            avfile.avaibilityAudioVisual(signature, 1);                            
+                        }else{
+                            bfile.avaibilityBook(signature, 1);
+                        }
 
                         lfile.deleteLoan(signature);
                         lfile.close();
+                        
+                        lbl_avaibility.setText("The availability of article " + signature + " was increased");
                         lbl_successL.setVisible(true);
                         lbl_payLoan.setDisable(true);
                         lbl_loans.setDisable(true);
@@ -1328,12 +1425,9 @@ public class InterfaceModules {
         deliveryColumn.setMinWidth(150);
         deliveryColumn.setCellValueFactory(new PropertyValueFactory<>("deliveryDay"));
 
-        TableColumn kindColumn = new TableColumn("Article");
-        kindColumn.setMinWidth(150);
-        kindColumn.setCellValueFactory(new PropertyValueFactory<>("kind"));
 
-        tvw_viewLoan.getColumns().addAll(idColumn, signatureColumn, loanDayColumn, deliveryColumn, kindColumn);
-        tvw_viewLoan.setPrefSize(750, 500);
+        tvw_viewLoan.getColumns().addAll(idColumn, signatureColumn, loanDayColumn, deliveryColumn);
+        tvw_viewLoan.setPrefSize(600, 500);
         tvw_viewLoan.setTableMenuButtonVisible(true);
         gpn_viewloans.add(tvw_viewLoan, 0, 0);
 

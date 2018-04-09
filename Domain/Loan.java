@@ -6,9 +6,9 @@ public class Loan {
     private String signature;
     private String loanDay;
     private String deliveryDay;
-    private String kind;
+    private boolean kind;
 
-    public Loan(String studentId, String signature, String loanDay, String deliveryDay, String kind) {
+    public Loan(String studentId, String signature, String loanDay, String deliveryDay, boolean kind) {
         this.studentId = studentId;
         this.signature = signature;
         this.loanDay = loanDay;
@@ -21,14 +21,14 @@ public class Loan {
         this.signature = "";
         this.loanDay = "";
         this.deliveryDay = "";
-        this.kind = "";
+        this.kind = false;
     }
 
-    public String getKind() {
+    public boolean getKind() {
         return kind;
     }
 
-    public void setKind(String kind) {
+    public void setKind(boolean kind) {
         this.kind = kind;
     }
     
@@ -77,7 +77,7 @@ public class Loan {
                 + this.getSignature().length() * 2 + 2
                 + this.getLoanDay().length() * 2 + 2
                 + this.getDeliveryDay().length() * 2 + 2
-                + this.getKind().length() * 2 + 2;
+                + 1;
 
     }//fin sizeInBytes()
 

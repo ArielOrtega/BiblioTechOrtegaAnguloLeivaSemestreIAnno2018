@@ -1,15 +1,13 @@
 package File;
 
 import Domain.Loan;
-import java.awt.List;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OptionalDataException;
 import java.io.RandomAccessFile;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.Date;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -62,7 +60,7 @@ public class LoanFile {
                 randomAccessFile.writeUTF(loan.getSignature());
                 randomAccessFile.writeUTF(loan.getLoanDay());
                 randomAccessFile.writeUTF(loan.getDeliveryDay());
-                randomAccessFile.writeUTF(loan.getKind());
+                randomAccessFile.writeBoolean(loan.getKind());
 
                 return true;
             }
@@ -91,7 +89,7 @@ public class LoanFile {
             loanTemp.setSignature(randomAccessFile.readUTF());
             loanTemp.setLoanDay(randomAccessFile.readUTF());
             loanTemp.setDeliveryDay(randomAccessFile.readUTF());
-            loanTemp.setKind(randomAccessFile.readUTF());
+            loanTemp.setKind(randomAccessFile.readBoolean());
 
 //            if (loanTemp.getSignature().equalsIgnoreCase("deleted")) {
 //                return null;
@@ -133,7 +131,7 @@ public class LoanFile {
             Loan lTemp = this.getLoan(i);
 
             if (lTemp != null && !lTemp.getSignature().equalsIgnoreCase("deleted")) {
-                carsArray.add(lTemp);
+                 carsArray.add(lTemp);
             }
 
         }//end for       
@@ -176,20 +174,17 @@ public class LoanFile {
 
     }//end method
 
-    public long numberOfDays(int deliveryDay, int deliveryMonth, int deliveyYear,
-            int realDeDay, int realDeMonth, int realDeYear) {
+    public long numberOfDays(String date1, String date2) throws ParseException {
 
-        Calendar c = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        Calendar fechaInicio = new GregorianCalendar();
-        fechaInicio.set(deliveyYear, deliveryMonth, deliveryDay);
+        Date deliveryDay = dateFormat.parse(date1);
+        Date realDeDay = dateFormat.parse(date2);
+        
+        long dias = (long) ((realDeDay.getTime()-deliveryDay.getTime())/86400000);
+        
+        return dias;
 
-        Calendar fechaFin = new GregorianCalendar();
-        fechaFin.set(realDeDay, realDeMonth, realDeDay);
-
-        c.setTimeInMillis(fechaFin.getTime().getTime() - fechaInicio.getTime().getTime());
-
-        return c.get(Calendar.DAY_OF_YEAR);
     }//end method
 
     public long fineOfPayment(long numberOfdays) {
@@ -203,6 +198,5 @@ public class LoanFile {
         }
         return pay;
     }//end method
-   
 
 }//end LoanFile
