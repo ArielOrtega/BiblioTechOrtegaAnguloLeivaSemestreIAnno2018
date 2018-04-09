@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -54,7 +55,7 @@ public class MainInterface extends Application {
 
         //Modificaciones del HBox
         hbx_window.setAlignment(Pos.CENTER);
-        hbx_window.setSpacing(10);
+        hbx_window.setSpacing(40);
 
         Scene scene = new Scene(new VBox(), 1000, 650);
 
@@ -123,7 +124,7 @@ public class MainInterface extends Application {
                 hbx_window.getChildren().clear();
                 presenter.getChildren().clear();
                 presenter.getChildren().addAll(interfaceM.enterLoan());
-            } catch (IOException ex) {
+            } catch (IOException | ClassNotFoundException ex) {
                 Logger.getLogger(MainInterface.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
@@ -160,7 +161,12 @@ public class MainInterface extends Application {
 
         //Creaci'on del MenuBar que depliega las opciones a elegir
         MenuBar mnb_mainMenu = new MenuBar();
-        mnb_mainMenu.setStyle("-fx-background-color: white");
+        mnb_mainMenu.setStyle("-fx-background-color: \n" +
+"    linear-gradient(#7F7679, #9C9C9C),\n" +
+"    linear-gradient(#9C9C9C, #7F7679),\n" +
+"    linear-gradient(from 0% 0% to 15% 50%, rgba(246,246,246,0.9), rgba(246,246,246,0));\n" +
+"    -fx-font-size: 14px;\n" +
+"    -fx-padding: 10 20 10 20;");
         //Agregaci'on de las categor'ias al MenuBar
         mnb_mainMenu.getMenus().addAll(mnu_menuStudents, mnu_menuMaterials, mnu_menuLoans);
 

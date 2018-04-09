@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OptionalDataException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -48,5 +50,20 @@ public class LogicalMethods {
         
         return options;
     }
+    
+    public String buscarSignatura(String nameArticle) throws IOException{
+        
+        BooksFile bf= new BooksFile(new File("./Books.dat"));
+        String signature="";
+    
+        for (int i = 0; i < bf.getAllBooks().size() ; i++) {
+            if(bf.getAllBooks().get(i).getName().equalsIgnoreCase(nameArticle)){
+                signature= bf.getAllBooks().get(i).getSignature();
+            }
+        }
+        
+        return signature;
+    }
+    
 }
 

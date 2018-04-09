@@ -175,4 +175,14 @@ public class AudioVisualFile {
         return listAudioVisual;
         
     }
+    
+    public boolean getAvailability(String signature) throws IOException{
+        boolean availability = false;
+        for (int i = 0; i < this.regsQuantity; i++) {
+            if(this.getAudioVisual(i).getSignature().equalsIgnoreCase(signature)&&(this.getAudioVisual(i).getAvailability()>0)){
+                availability = true;
+            }
+        }//end for
+        return availability;
+    }    
 }

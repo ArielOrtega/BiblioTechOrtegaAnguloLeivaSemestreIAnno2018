@@ -68,8 +68,8 @@ public class LoanFile {
     }//end method
 
     //Metodo para que el siguiente ingreso de datos sea al final del archivo
-    public void addEndRecord(Loan car) throws IOException {
-        if (putValue(this.regsQuantity, car)) {
+    public void addEndRecord(Loan loan) throws IOException {
+        if (putValue(this.regsQuantity, loan)) {
             regsQuantity++;
         }
     }//end method

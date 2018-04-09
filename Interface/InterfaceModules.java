@@ -59,6 +59,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.util.converter.LocalDateStringConverter;
+import javax.swing.JOptionPane;
 import org.controlsfx.control.textfield.TextFields;
 
 public class InterfaceModules {
@@ -535,7 +536,7 @@ public class InterfaceModules {
         descritionAVColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
 
         tvw_viewAudiovisual.getColumns().addAll(nameAVColumn, signatureAVColumn, brandAVColumn, availabilityAVColumn, descritionAVColumn);
-        tvw_viewAudiovisual.setPrefSize(750, 475);
+        tvw_viewAudiovisual.setPrefSize(1100, 475);
         tvw_viewAudiovisual.setTableMenuButtonVisible(true);
         gpn_viewMaterial.add(tvw_viewAudiovisual, 1, 1);
 
@@ -778,11 +779,12 @@ public class InterfaceModules {
 
     }
 
-    public static GridPane enterLoan() throws IOException {
+    public static GridPane enterLoan() throws IOException, ClassNotFoundException {
 
         LoanFile lFile = new LoanFile(new File("./Loans.dat"));
         AudioVisualFile avfile = new AudioVisualFile(new File("./AudioVisual.dat"));
         BooksFile bfile = new BooksFile(new File("./Books.dat"));
+        LogicalMethods methods = new LogicalMethods();
 
         GridPane gpn_enterLoan = new GridPane();
 
@@ -822,19 +824,19 @@ public class InterfaceModules {
         tfd_idStudent = new TextField();
         Tooltip enter = new Tooltip("Presione enter");
         tfd_idStudent.setTooltip(enter);
+
         tfd_idStudent.setOnAction((event) -> {
             try {
-                LogicalMethods methods = new LogicalMethods();
                 StudentFile sft = new StudentFile();
-                if (!methods.checkStudentRecord(tfd_idStudent.getText())) {
-                    tfd_idStudent.clear();
-                    lbl_exception.setVisible(true);
-                    btn_checkStudent.setDisable(true);
-                } else {
+                if (methods.checkStudentRecord(tfd_idStudent.getText())) {
                     btn_checkStudent.setDisable(false);
                     lbl_exception.setVisible(false);
                     lbl_studentInfo.setText(sft.studentInfo(tfd_idStudent.getText()));
                     tfd_idStudent.setDisable(true);
+                } else {
+                    tfd_idStudent.clear();
+                    lbl_exception.setVisible(true);
+                    btn_checkStudent.setDisable(true);
                 }
             } catch (FileNotFoundException | ClassNotFoundException | OptionalDataException ex) {
                 Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
@@ -880,6 +882,7 @@ public class InterfaceModules {
             }
 
         });//end Button
+
         gpn_enterLoan.add(btn_checkStudent, 3, 3);
 
         lbl_nameArticle = new Label("Name of Article");
@@ -890,6 +893,20 @@ public class InterfaceModules {
 
         tfd_nameArticle = new TextField();
         tfd_nameArticle.setVisible(false);
+
+        //Opciones de autocompletado
+        String options2[] = methods.autocompleteOptions();
+        TextFields.bindAutoCompletion(tfd_nameArticle, options2);
+        tfd_nameArticle.setOnAction((event) -> {
+
+            try {
+                tfd_signatureB.setText(methods.buscarSignatura(tfd_nameArticle.getText()));
+            } catch (IOException ex) {
+                Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        });
+
         gpn_enterLoan.add(tfd_nameArticle, 1, 3);
 
         lbl_signature = new Label("Article Signature");
@@ -968,7 +985,7 @@ public class InterfaceModules {
         lbl_warning = new Label("¡Unregistered loan!");
         lbl_warning.setVisible(false);
         lbl_warning.setTextFill(Color.RED);
-        lbl_warning.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        //lbl_warning.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterLoan.add(lbl_warning, 3, 4, 4, 6);
 
         lbl_success = new Label("¡The loan was registered!");
@@ -988,28 +1005,19 @@ public class InterfaceModules {
             @Override
             public void handle(ActionEvent event) {
 
-                try {
-                    tfd_signatureAV.setVisible(false);
-                    lbl_signature.setVisible(true);
-                    tfd_signatureB.setVisible(true);
-                    lbl_deliveryDay.setVisible(true);
-                    dpk_delivaeyDay.setVisible(true);
-                    btn_enterLoan.setVisible(true);
-                    btn_exit.setVisible(true);
-                    lbl_nameArticle.setVisible(true);
-                    tfd_nameArticle.setVisible(true);
+//                try {
+                tfd_signatureAV.setVisible(false);
+                lbl_signature.setVisible(true);
+                tfd_signatureB.setVisible(true);
+                lbl_deliveryDay.setVisible(true);
+                dpk_delivaeyDay.setVisible(true);
+                btn_enterLoan.setVisible(true);
+                btn_exit.setVisible(true);
+                lbl_nameArticle.setVisible(true);
+                tfd_nameArticle.setVisible(true);
 
-                    //tfd_signatureB.setText("ISBN-");
-                    LogicalMethods methods = new LogicalMethods();
-                    String options[] = methods.autocompleteOptions();
-                    TextFields.bindAutoCompletion(tfd_nameArticle, options);
-
-                    btn_enterLoan.setDisable(false);
-                    dpk_delivaeyDay.setValue(LocalDate.now());
-
-                } catch (IOException ex) {
-                    Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                btn_enterLoan.setDisable(false);
+                dpk_delivaeyDay.setValue(LocalDate.now());
 
             }
         });
@@ -1033,7 +1041,7 @@ public class InterfaceModules {
         gpn_enterLoan.add(tfd_signatureAV, 1, 2);
 
         rdb_choiceAV = new RadioButton("Audiovisual");
-        rdb_choiceAV.setTextFill(Color.WHITE);        
+        rdb_choiceAV.setTextFill(Color.WHITE);
         rdb_choiceAV.setVisible(false);
         rdb_choiceAV.setToggleGroup(group);
         rdb_choiceAV.setOnAction(new EventHandler<ActionEvent>() {
@@ -1086,41 +1094,82 @@ public class InterfaceModules {
                     boolean kind = false;
 
                     if (rdb_choiceAV.isSelected()) {
-                        kind = true;
-                        loan1 = new Loan(idStudent, signatureAV, loanDay, deliveryDay, kind);
-                        try {
-                            avfile.lessAvaibilityAudioVisual(signatureAV);
-                            avfile.close();
+                        try{
+                            if (avfile.getAvailability(signatureAV)) {
+                                kind = true;
+                                loan1 = new Loan(idStudent, signatureAV, loanDay, deliveryDay, kind);
+                                avfile.lessAvaibilityAudioVisual(signatureAV);
+                                avfile.close();
+                                lFile.addEndRecord(loan1);
+                                lbl_success.setVisible(true);
+                                lbl_notValueEnter.setVisible(false);
+                                tfd_signatureB.setDisable(true);
+                                tfd_signatureAV.setDisable(true);
+                                dpk_delivaeyDay.setDisable(true);
+                                rdb_choiceBook.setDisable(true);
+                                rdb_choiceAV.setDisable(true);
+                                btn_enterLoan.setDisable(true);
+                                lbl_info.setVisible(true);
+                                lbl_studentInfo.setVisible(false);
+                                tfd_nameArticle.setDisable(true);
+                                tfd_nameArticle.setText("");                   
+                            
+                            } else {
+                                lbl_warning.setVisible(true);
+                                lbl_warning.setText("Material no disponible");
+//                                lbl_success.setVisible(true);
+//                                lbl_success.setText("Material no disponible");
+                            }
                         } catch (IOException ex) {
                             Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     } else {
-                        kind = false;
-                        loan1 = new Loan(idStudent, signatureB, loanDay, deliveryDay, kind);
+                        //Implementar excepcion 
                         try {
-                            bfile.lessAvaibilityBook(signatureB);
-                            bfile.close();
+                            if (bfile.getAvailability(signatureB)) {
+                                kind = false;
+                                loan1 = new Loan(idStudent, signatureB, loanDay, deliveryDay, kind);
+                                bfile.lessAvaibilityBook(signatureB);
+                                bfile.close();
+                                lFile.addEndRecord(loan1);
+                                lbl_success.setVisible(true);
+                                lbl_notValueEnter.setVisible(false);
+                                tfd_signatureB.setDisable(true);
+                                tfd_signatureAV.setDisable(true);
+                                dpk_delivaeyDay.setDisable(true);
+                                rdb_choiceBook.setDisable(true);
+                                rdb_choiceAV.setDisable(true);
+                                btn_enterLoan.setDisable(true);
+                                lbl_info.setVisible(true);
+                                lbl_studentInfo.setVisible(false);
+                                tfd_nameArticle.setDisable(true);
+                                tfd_nameArticle.setText("");
+
+                            } else {
+                                lbl_warning.setVisible(true);
+                                lbl_warning.setText("Material no disponible");
+//                                lbl_success.setVisible(true);
+//                                lbl_success.setText("Material no disponible");
+                            }
+
                         } catch (IOException ex) {
                             Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                     try {
 
-                        lFile.addEndRecord(loan1);
                         lFile.close();
 
-                        lbl_notValueEnter.setVisible(false);
-                        tfd_signatureB.setDisable(true);
-                        tfd_signatureAV.setDisable(true);
-                        dpk_delivaeyDay.setDisable(true);
-                        rdb_choiceBook.setDisable(true);
-                        rdb_choiceAV.setDisable(true);
-                        btn_enterLoan.setDisable(true);
-                        lbl_info.setVisible(true);
-                        lbl_studentInfo.setVisible(false);
-                        tfd_nameArticle.setDisable(true);
-                        lbl_success.setVisible(true);
-
+//                        lbl_notValueEnter.setVisible(false);
+//                        tfd_signatureB.setDisable(true);
+//                        tfd_signatureAV.setDisable(true);
+//                        dpk_delivaeyDay.setDisable(true);
+//                        rdb_choiceBook.setDisable(true);
+//                        rdb_choiceAV.setDisable(true);
+//                        btn_enterLoan.setDisable(true);
+//                        lbl_info.setVisible(true);
+//                        lbl_studentInfo.setVisible(false);
+//                        tfd_nameArticle.setDisable(true);
                         //Se limpian los valores anteriormente ingresados 
                         tfd_idStudent.setText("");
                         tfd_signatureB.setText("");
@@ -1133,6 +1182,7 @@ public class InterfaceModules {
                 }
 
             }
+
         });
         gpn_enterLoan.add(btn_enterLoan, 4, 4);
 
@@ -1275,7 +1325,7 @@ public class InterfaceModules {
                     lbl_warningL.setVisible(true);
 
                 } else {
-                    
+
                     lbl_warningL.setVisible(false);
                     lbl_signatLoan.setVisible(false);
                     tfd_signatLoan.setVisible(false);
@@ -1292,8 +1342,7 @@ public class InterfaceModules {
                     btn_delete.setVisible(true);
 
                     LocalDate date = LocalDate.now();
-                    String dateNow = "" +date;
-
+                    String dateNow = "" + date;
 
                     long balance = lfile.numberOfDays(lfile.getLoan(lfile.searchLoan(signature)).getDeliveryDay(), dateNow);
 
@@ -1319,12 +1368,12 @@ public class InterfaceModules {
         lbl_successL.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         lbl_successL.setVisible(false);
         gpn_deleteLoan.add(lbl_successL, 4, 5, 5, 5);
-        
+
         Label lbl_avaibility = new Label();
         lbl_avaibility.setTextFill(Color.WHITE);
         lbl_avaibility.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_deleteLoan.add(lbl_avaibility, 4, 6, 5, 6);
-        
+
         btn_delete = new Button("Delete");
         btn_delete.setVisible(false);
         btn_delete.setOnAction(
@@ -1332,15 +1381,15 @@ public class InterfaceModules {
 
                     try {
                         //si la condicion se satisface es porque el articulo pertenece a Audiovisuales
-                        if(lfile.getLoan(lfile.searchLoan(signature)).getKind()){                            
-                            avfile.avaibilityAudioVisual(signature, 1);                            
-                        }else{
+                        if (lfile.getLoan(lfile.searchLoan(signature)).getKind()) {
+                            avfile.avaibilityAudioVisual(signature, 1);
+                        } else {
                             bfile.avaibilityBook(signature, 1);
                         }
 
                         lfile.deleteLoan(signature);
                         lfile.close();
-                        
+
                         lbl_avaibility.setText("The availability of article " + signature + " was increased");
                         lbl_successL.setVisible(true);
                         lbl_payLoan.setDisable(true);
@@ -1424,7 +1473,6 @@ public class InterfaceModules {
         TableColumn deliveryColumn = new TableColumn("Delivery Day");
         deliveryColumn.setMinWidth(150);
         deliveryColumn.setCellValueFactory(new PropertyValueFactory<>("deliveryDay"));
-
 
         tvw_viewLoan.getColumns().addAll(idColumn, signatureColumn, loanDayColumn, deliveryColumn);
         tvw_viewLoan.setPrefSize(600, 500);

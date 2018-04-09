@@ -193,6 +193,16 @@ public class BooksFile {
         return booksArray;
     }
     
+    public boolean getAvailability(String signature) throws IOException{
+        boolean availability = false;
+        for (int i = 0; i < this.regsQuantity; i++) {
+            if(this.getBook(i).getSignature().equalsIgnoreCase(signature)&&(this.getBook(i).getAvailability()>0)){
+                availability = true;
+            }
+        }//end for
+        return availability;
+    }
+    
     public ObservableList<Books> getBooks() throws IOException {
         ArrayList<Books> bookArray = new ArrayList<Books>();
 
