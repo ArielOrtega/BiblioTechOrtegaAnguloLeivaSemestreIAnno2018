@@ -52,6 +52,8 @@ public class MainInterface extends Application {
         //HBox y VBox
         HBox hbx_window = new HBox();
         VBox vbx_upperSide = new VBox();
+        VBox vbx_logoAndMenu = new VBox();
+        vbx_logoAndMenu.setStyle("-fx-background-color: DIMGray");
 
         //Modificaciones del HBox
         hbx_window.setAlignment(Pos.CENTER);
@@ -62,6 +64,7 @@ public class MainInterface extends Application {
         //Menu que despliega categor'ias principales
         //Categor'ia estudiantes
         Menu mnu_menuStudents = new Menu("Students");
+        mnu_menuStudents.setStyle("-fx-selection-bar: LIGHTGRAY");
         mnu_menuStudents.setMnemonicParsing(true);
 
         //Subcategor'ia para ingresar y ver estudiantes
@@ -76,6 +79,7 @@ public class MainInterface extends Application {
 
         //Categor'ia materiales
         Menu mnu_menuMaterials = new Menu("Materials");
+        mnu_menuMaterials.setStyle("-fx-selection-bar: LIGHTGRAY");
         mnu_menuMaterials.setMnemonicParsing(true);
 
         //Subcategor'ia de materiales para ingresar un libro
@@ -115,6 +119,7 @@ public class MainInterface extends Application {
 
         //Categor'ia prestamos
         Menu mnu_menuLoans = new Menu("Loans");
+        mnu_menuLoans.setStyle("-fx-selection-bar: LIGHTGRAY");
         mnu_menuLoans.setMnemonicParsing(true);
 
         //Subcategor'ia de pr'estamos para realizar un prestamo
@@ -161,12 +166,13 @@ public class MainInterface extends Application {
 
         //Creaci'on del MenuBar que depliega las opciones a elegir
         MenuBar mnb_mainMenu = new MenuBar();
+        mnb_mainMenu.setStyle("-fx-selection-bar: LIGHTGRAY");
         mnb_mainMenu.setStyle("-fx-background-color: \n" +
-"    linear-gradient(#7F7679, #9C9C9C),\n" +
-"    linear-gradient(#9C9C9C, #7F7679),\n" +
-"    linear-gradient(from 0% 0% to 15% 50%, rgba(246,246,246,0.9), rgba(246,246,246,0));\n" +
-"    -fx-font-size: 14px;\n" +
-"    -fx-padding: 10 20 10 20;");
+"    linear-gradient(deepskyblue, deepskyblue),\n" + //lightseagreen
+"    linear-gradient(lightseagreen, lightseagreen),\n" +
+"    linear-gradient(from 65% 45% to 0% 0%, rgba(126,126,126,1.3), rgba(246,246,246,0));\n" +
+"    -fx-font-size: 15px;\n" +
+"    -fx-padding: 15 50 10 40;");
         //Agregaci'on de las categor'ias al MenuBar
         mnb_mainMenu.getMenus().addAll(mnu_menuStudents, mnu_menuMaterials, mnu_menuLoans);
 
@@ -183,7 +189,8 @@ public class MainInterface extends Application {
         presenter.setPrefSize(scene.getWidth(), scene.getWidth());
 
         //Agregaci'on de todos los componentes de la interfaz 
-        vbx_upperSide.getChildren().addAll(imv_logo, mnb_mainMenu, hbx_window, presenter);
+        vbx_logoAndMenu.getChildren().addAll(imv_logo, mnb_mainMenu);
+        vbx_upperSide.getChildren().addAll(vbx_logoAndMenu, hbx_window, presenter);
 
         return vbx_upperSide;
 

@@ -51,6 +51,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -79,6 +80,7 @@ public class InterfaceModules {
     static Loan loan1;
     static AudioVisualFile avf;
     static String signatureB, signatureAV, signature, idLoan;
+    static TableView<Student> table;
     static MainInterface mI = new MainInterface();
     StudentFile sft = new StudentFile();
     File file = new File("studentFile.txt");
@@ -87,19 +89,35 @@ public class InterfaceModules {
     public GridPane studentRegister() {
 
         GridPane gridpane = new GridPane();
-
+        
+        
         //Labels
         Label lbl_title = new Label("Add Students");
+        lbl_title.setFont(Font.font("OPEN SANS", 16));
+        lbl_title.setTextFill(Color.WHITE);
+        
         Label lbl_name = new Label("Name");
+        lbl_name.setFont(Font.font("OPEN SANS", 16));
+        lbl_name.setTextFill(Color.WHITE);
+        
         Label lbl_entryYear = new Label("Entry year");
+        lbl_entryYear.setFont(Font.font("OPEN SANS", 16));
+        lbl_entryYear.setTextFill(Color.WHITE);
+        
         Label lbl_exception = new Label("Insert data correctly");
+        lbl_exception.setFont(Font.font("OPEN SANS", 16));
+        lbl_exception.setTextFill(Color.WHITE);
+        
         Label lbl_phone = new Label("Telephone Number");
+        lbl_phone.setFont(Font.font("OPEN SANS", 16));
+        lbl_phone.setTextFill(Color.WHITE);
         lbl_exception.setVisible(false);
 
         //TextFields
         TextField tfd_name = new TextField();
         TextField tfd_entryYear = new TextField();
         TextField tfd_phone = new TextField();
+        tfd_phone.setPromptText("11112222");
 
         tfd_name.setPromptText("Name");
         tfd_entryYear.setPromptText("Year");
@@ -115,17 +133,39 @@ public class InterfaceModules {
                 }
             }
         });
-        tfd_phone.setPromptText("Telephone");
 
         //ComboBox para opciones de carreras existentes
         ComboBox<String> cb_career = new ComboBox<>();
         cb_career.getItems().addAll("Informática", "Administración", "Turismo");
         cb_career.setPromptText("Career");
         cb_career.setEditable(false);
+        
+        
+        //boton ingresar
+        Button btn_insertStudent = new Button("Insert Student");
+        btn_insertStudent.setTextFill(Color.BLACK);
+        btn_insertStudent.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 15));
+        btn_insertStudent.setStyle("-fx-background-color: antiquewhite;-fx-border-color: TRANSPARENT");
+        btn_insertStudent.setOnMouseEntered((event) -> {
+
+            btn_insertStudent.setTextFill(Color.ANTIQUEWHITE);
+            btn_insertStudent.setStyle("-fx-background-color: lightseagreen;-fx-border-color: TRANSPARENT");
+
+        });
+        btn_insertStudent.setOnMouseExited((event) -> {
+
+            btn_insertStudent.setTextFill(Color.BLACK);
+            btn_insertStudent.setStyle("-fx-background-color: antiquewhite;-fx-border-color: TRANSPARENT");
+
+        });
+        
 
         //Funcion del ComboBox
-        cb_career.setOnAction((event) -> {
-            try {
+        btn_insertStudent.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                try {
                 String name = tfd_name.getText();
                 int year = Integer.parseInt(tfd_entryYear.getText());
                 String phone = tfd_phone.getText();
@@ -141,11 +181,22 @@ public class InterfaceModules {
 
                     //Se añade al obsevable list
                     observableArrayStudent.add(s);
+                    lbl_exception.setVisible(false);
+                    
+                    
 
                     if (file.exists()) {
                         sft.serializeList(s);
                     } else {
                         sft.serializeStudent(s);
+                    }
+                    
+                    try {
+                        table.setItems(FXCollections.observableArrayList(sft.readList()));
+                    } catch (FileNotFoundException | ClassNotFoundException | OptionalDataException ex) {
+                         Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                         Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
                     //arrayListStudent.add(s);
@@ -168,20 +219,23 @@ public class InterfaceModules {
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(InterfaceModules.class.getName()).log(Level.SEVERE, null, ex);
             }
-
+            }
         });
 
         //Agregación de los nodulos al GridPane que se retorna
         gridpane.add(lbl_title, 0, 0);
-        gridpane.add(lbl_name, 0, 2);
-        gridpane.add(tfd_name, 0, 3);
-        gridpane.add(lbl_entryYear, 0, 5);
-        gridpane.add(tfd_entryYear, 0, 6);
-        gridpane.add(lbl_phone, 0, 8);
-        gridpane.add(tfd_phone, 0, 9);
-        gridpane.add(cb_career, 0, 11);
-        gridpane.add(lbl_exception, 0, 12);
-        gridpane.setVgap(5);
+        gridpane.add(lbl_name, 0, 1);
+        gridpane.add(tfd_name, 0, 2);
+        gridpane.add(lbl_entryYear, 0, 3);
+        gridpane.add(tfd_entryYear, 0, 4);
+        gridpane.add(lbl_phone, 0, 6);
+        gridpane.add(tfd_phone, 0, 7);
+        gridpane.add(cb_career, 0, 8);
+        gridpane.add(btn_insertStudent, 0, 10);
+        gridpane.add(lbl_exception, 0, 11);
+        gridpane.setVgap(20);
+        gridpane.setHgap(10);
+        gridpane.setPadding(new  Insets(15));
 
         return gridpane;
     }
@@ -189,7 +243,7 @@ public class InterfaceModules {
     public VBox showTableView() {
 
         //Se crea una tabla (Tableview) que mostrar'a la lista de estudiantes registrados
-        TableView<Student> table = new TableView<>();
+        table = new TableView<>();
 
         TableColumn columnId = new TableColumn("ID");
         columnId.setMinWidth(100);
@@ -219,6 +273,23 @@ public class InterfaceModules {
 
         //Bot'on para mostrar la lista de estudiantes
         Button btn_showRecords = new Button("See Records");
+        
+        btn_showRecords.setTextFill(Color.BLACK);
+        btn_showRecords.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 15));
+        btn_showRecords.setStyle("-fx-background-color: antiquewhite;-fx-border-color: TRANSPARENT");
+        btn_showRecords.setOnMouseEntered((event) -> {
+
+            btn_showRecords.setTextFill(Color.ANTIQUEWHITE);
+            btn_showRecords.setStyle("-fx-background-color: lightseagreen;-fx-border-color: TRANSPARENT");
+
+        });
+        btn_showRecords.setOnMouseExited((event) -> {
+
+            btn_showRecords.setTextFill(Color.BLACK);
+            btn_showRecords.setStyle("-fx-background-color: antiquewhite;-fx-border-color: TRANSPARENT");
+
+        });
+        
         btn_showRecords.setOnAction((event) -> {
             try {
                 table.setItems(FXCollections.observableArrayList(sft.readList()));
@@ -233,6 +304,8 @@ public class InterfaceModules {
         hbox_buttons.getChildren().addAll(btn_showRecords);
 
         VBox vbox = new VBox();
+        vbox.setSpacing(10);
+        vbox.setPadding(new Insets(40));
         vbox.getChildren().addAll(table, hbox_buttons);
 
         return vbox;
@@ -260,32 +333,32 @@ public class InterfaceModules {
         gpn_enterBooks.setAlignment(Pos.CENTER);
 
         Label lbl_name = new Label("Title");
-        lbl_name.setTextFill(Color.BLACK);
-        lbl_name.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_name.setTextFill(Color.WHITE);
+        lbl_name.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
         gpn_enterBooks.add(lbl_name, 0, 0);
 
         TextField tfd_name = new TextField();
         gpn_enterBooks.add(tfd_name, 1, 0);
 
         Label lbl_signatureB = new Label("Signature");
-        lbl_signatureB.setTextFill(Color.BLACK);
-        lbl_signatureB.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_signatureB.setTextFill(Color.WHITE);
+        lbl_signatureB.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
         gpn_enterBooks.add(lbl_signatureB, 3, 0);
 
         TextField tfd_signatureB = new TextField();
         gpn_enterBooks.add(tfd_signatureB, 4, 0);
 
         Label lbl_author = new Label("Author");
-        lbl_author.setTextFill(Color.BLACK);
-        lbl_author.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_author.setTextFill(Color.WHITE);
+        lbl_author.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
         gpn_enterBooks.add(lbl_author, 0, 2);
 
         TextField tfd_author = new TextField();
         gpn_enterBooks.add(tfd_author, 1, 2);
 
         Label lbl_genre = new Label("Genre");
-        lbl_genre.setTextFill(Color.BLACK);
-        lbl_genre.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_genre.setTextFill(Color.WHITE);
+        lbl_genre.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
         gpn_enterBooks.add(lbl_genre, 3, 2);
 
         ComboBox cbx_genre = new ComboBox();
@@ -303,9 +376,9 @@ public class InterfaceModules {
         });
         gpn_enterBooks.add(cbx_genre, 4, 2);
 
-        Label lbl_idiom = new Label("Idiom");
-        lbl_idiom.setTextFill(Color.BLACK);
-        lbl_idiom.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        Label lbl_idiom = new Label("Language");
+        lbl_idiom.setTextFill(Color.WHITE);
+        lbl_idiom.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
         gpn_enterBooks.add(lbl_idiom, 0, 4);
 
         ComboBox cbx_idiom = new ComboBox();
@@ -323,15 +396,31 @@ public class InterfaceModules {
         gpn_enterBooks.add(cbx_idiom, 1, 4);
 
         Label lbl_description = new Label("Description");
-        lbl_description.setTextFill(Color.BLACK);
-        lbl_description.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_description.setTextFill(Color.WHITE);
+        lbl_description.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
         gpn_enterBooks.add(lbl_description, 3, 4);
 
         TextArea txa_description = new TextArea();
         txa_description.setPrefSize(400, 500);
         gpn_enterBooks.add(txa_description, 4, 4);
 
-        Button btn_enterBook = new Button("Enter Book");
+        Button btn_enterBook = new Button("Insert Book");
+        
+        btn_enterBook.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 15));
+        btn_enterBook.setStyle("-fx-background-color: antiquewhite;-fx-border-color: TRANSPARENT");
+        btn_enterBook.setOnMouseEntered((event) -> {
+
+            btn_enterBook.setTextFill(Color.ANTIQUEWHITE);
+            btn_enterBook.setStyle("-fx-background-color: lightseagreen;-fx-border-color: TRANSPARENT");
+
+        });
+        btn_enterBook.setOnMouseExited((event) -> {
+
+            btn_enterBook.setTextFill(Color.BLACK);
+            btn_enterBook.setStyle("-fx-background-color: antiquewhite;-fx-border-color: TRANSPARENT");
+
+        });
+        
         btn_enterBook.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -346,12 +435,14 @@ public class InterfaceModules {
                     Books book1 = new Books(tfd_author.getText(), genre, idiom, tfd_name.getText(), tfd_signatureB.getText(), 1, txa_description.getText());
 
                     Label lbl_success = new Label("¡Book entered successfully!");
-                    lbl_success.setTextFill(Color.GREEN);
-                    lbl_success.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+                    lbl_success.setTextFill(Color.FLORALWHITE);
+                    lbl_success.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
                     lbl_success.setVisible(false);
                     gpn_enterBooks.add(lbl_success, 3, 7, 4, 4);
 
                     Label lbl_error = new Label("Unfilled spaces");
+                    lbl_error.setTextFill(Color.WHITE);
+                    lbl_error.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
                     lbl_error.setVisible(false);
                     gpn_enterBooks.add(lbl_error, 3, 7, 4, 4);
 
@@ -406,24 +497,24 @@ public class InterfaceModules {
         gpn_enterAudioV.setPrefSize(300, 300);
 
         Label lbl_kind = new Label("Tipo:");
-        lbl_kind.setTextFill(Color.BLACK);
-        lbl_kind.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_kind.setTextFill(Color.WHITE);
+        lbl_kind.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
         gpn_enterAudioV.add(lbl_kind, 0, 0);
 
         TextField tfd_kind = new TextField();
         gpn_enterAudioV.add(tfd_kind, 1, 0);
 
         Label lbl_signatureAV = new Label("Signature:");
-        lbl_signatureAV.setTextFill(Color.BLACK);
-        lbl_signatureAV.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_signatureAV.setTextFill(Color.WHITE);
+        lbl_signatureAV.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
         gpn_enterAudioV.add(lbl_signatureAV, 3, 0);
 
         TextField tfd_signatureAV = new TextField();
         gpn_enterAudioV.add(tfd_signatureAV, 4, 0);
 
         Label lbl_brand = new Label("Brand:");
-        lbl_brand.setTextFill(Color.BLACK);
-        lbl_brand.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_brand.setTextFill(Color.WHITE);
+        lbl_brand.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
         gpn_enterAudioV.add(lbl_brand, 0, 2);
 
         TextField tfd_brand = new TextField();
@@ -437,15 +528,31 @@ public class InterfaceModules {
 //        TextField tfd_model = new TextField();
 //        gpn_enterAudioV.add(tfd_model, 4, 2);
         Label lbl_description = new Label("Description:");
-        lbl_description.setTextFill(Color.BLACK);
-        lbl_description.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_description.setTextFill(Color.WHITE);
+        lbl_description.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
         gpn_enterAudioV.add(lbl_description, 0, 4);
 
         TextArea txa_description = new TextArea();
         txa_description.setPrefSize(300, 400);
         gpn_enterAudioV.add(txa_description, 1, 4);
 
-        Button btn_enterAudioV = new Button("Enter Article");
+        Button btn_enterAudioV = new Button("Insert Article");
+        
+        btn_enterAudioV.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 15));
+        btn_enterAudioV.setStyle("-fx-background-color: antiquewhite;-fx-border-color: TRANSPARENT");
+        btn_enterAudioV.setOnMouseEntered((event) -> {
+
+            btn_enterAudioV.setTextFill(Color.ANTIQUEWHITE);
+            btn_enterAudioV.setStyle("-fx-background-color: lightseagreen;-fx-border-color: TRANSPARENT");
+
+        });
+        btn_enterAudioV.setOnMouseExited((event) -> {
+
+            btn_enterAudioV.setTextFill(Color.BLACK);
+            btn_enterAudioV.setStyle("-fx-background-color: antiquewhite;-fx-border-color: TRANSPARENT");
+
+        });
+        
         btn_enterAudioV.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -457,12 +564,14 @@ public class InterfaceModules {
                     AudioVisual audioVisual = new AudioVisual(tfd_brand.getText(), tfd_kind.getText(), tfd_signatureAV.getText(), 1, txa_description.getText());
 
                     Label lbl_success = new Label("¡Article entered successfully!");
-                    lbl_success.setTextFill(Color.GREEN);
-                    lbl_success.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+                    lbl_success.setTextFill(Color.FLORALWHITE);
+                    lbl_success.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
                     lbl_success.setVisible(false);
                     gpn_enterAudioV.add(lbl_success, 3, 7, 4, 4);
 
                     Label lbl_error = new Label("Unfilled spaces");
+                    lbl_error.setTextFill(Color.WHITE);
+                    lbl_error.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
                     lbl_error.setVisible(false);
                     gpn_enterAudioV.add(lbl_error, 3, 7, 4, 4);
 
@@ -536,7 +645,7 @@ public class InterfaceModules {
         descritionAVColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
 
         tvw_viewAudiovisual.getColumns().addAll(nameAVColumn, signatureAVColumn, brandAVColumn, availabilityAVColumn, descritionAVColumn);
-        tvw_viewAudiovisual.setPrefSize(1100, 475);
+        tvw_viewAudiovisual.setPrefSize(1100, 375);
         tvw_viewAudiovisual.setTableMenuButtonVisible(true);
         gpn_viewMaterial.add(tvw_viewAudiovisual, 1, 1);
 
@@ -546,14 +655,14 @@ public class InterfaceModules {
         //label por si no selecciono un item en la tabla
         Label lbl_unselected_row = new Label("You have not selected any article");
         lbl_unselected_row.setVisible(false);
-        lbl_unselected_row.setTextFill(Color.RED);
-        lbl_unselected_row.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_unselected_row.setTextFill(Color.FLORALWHITE);
+        lbl_unselected_row.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
 
         //exito al ingresar ejemplares
         Label lbl_success_row = new Label("Increased succesfully!");
         lbl_success_row.setVisible(false);
-        lbl_success_row.setTextFill(Color.GREEN);
-        lbl_success_row.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_success_row.setTextFill(Color.FLORALWHITE);
+        lbl_success_row.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
 
         //boton para aumentar la disponibilidad audiovisual
         Button btn_increaseAvaibility = new Button("Increase availability");
@@ -653,7 +762,7 @@ public class InterfaceModules {
 
         tvw_viewBooks.getColumns().addAll(nameBColumn, authorBColumn, signatureBColumn, genreBColumn,
                 lenguageBColumn, availabilityBColumn, descriptionBColumn);
-        tvw_viewBooks.setPrefSize(1100, 475);
+        tvw_viewBooks.setPrefSize(1100, 375);
         gpn_viewMaterial.add(tvw_viewBooks, 1, 1);
 
         HBox hbx_2nodesB = new HBox();
@@ -662,14 +771,14 @@ public class InterfaceModules {
         //label por si no selecciono un item en la tabla
         Label lbl_unselected_rowB = new Label("You have not selected any article");
         lbl_unselected_rowB.setVisible(false);
-        lbl_unselected_rowB.setTextFill(Color.RED);
-        lbl_unselected_rowB.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_unselected_rowB.setTextFill(Color.FLORALWHITE);
+        lbl_unselected_rowB.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
 
         //exito al ingresar ejemplares
         Label lbl_success_rowB = new Label("Increased succesfully!");
         lbl_success_rowB.setVisible(false);
-        lbl_success_rowB.setTextFill(Color.GREEN);
-        lbl_success_rowB.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_success_rowB.setTextFill(Color.FLORALWHITE);
+        lbl_success_rowB.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
 
         //inrementalibros
         Button btn_increaseAvaibilityB = new Button("Increase availability");
@@ -734,12 +843,14 @@ public class InterfaceModules {
 
         Label lbl_titleBooks = new Label("Books");
         lbl_titleBooks.setFont(Font.font("Opens Sans"));
+        lbl_titleBooks.setTextFill(Color.WHITE);
         lbl_titleBooks.setStyle("-fx-font-weight: bold; -fx-font-size: 25");
         gpn_viewMaterial.add(lbl_titleBooks, 1, 2);
 
         Label lbl_titleAudioVisuals = new Label("AudioVisuales");
         lbl_titleAudioVisuals.setVisible(false);
         lbl_titleAudioVisuals.setFont(Font.font("Opens Sans"));
+        lbl_titleAudioVisuals.setTextFill(Color.WHITE);
         lbl_titleAudioVisuals.setStyle("-fx-font-weight: bold; -fx-font-size: 25");
         gpn_viewMaterial.add(lbl_titleAudioVisuals, 1, 2);
 
@@ -811,14 +922,14 @@ public class InterfaceModules {
         gpn_enterLoan.add(lbl_idStudent, 0, 3);
 
         Label lbl_exception = new Label("Student not found");
-        lbl_exception.setTextFill(Color.RED);
-        lbl_exception.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_exception.setTextFill(Color.WHITE);
+        lbl_exception.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
         lbl_exception.setVisible(false);
         gpn_enterLoan.add(lbl_exception, 1, 4);
 
         Label lbl_studentInfo = new Label();
         lbl_studentInfo.setTextFill(Color.WHITE);
-        lbl_studentInfo.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_studentInfo.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
         gpn_enterLoan.add(lbl_studentInfo, 0, 4, 2, 5);
 
         tfd_idStudent = new TextField();
@@ -861,8 +972,8 @@ public class InterfaceModules {
 
         Label lbl_notValue = new Label("Enter a value");
         lbl_notValue.setVisible(false);
-        lbl_notValue.setTextFill(Color.RED);
-        lbl_notValue.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_notValue.setTextFill(Color.FLORALWHITE);
+        lbl_notValue.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
         gpn_enterLoan.add(lbl_notValue, 2, 4, 3, 4);
         btn_checkStudent = new Button("Enter");
         btn_checkStudent.setDisable(true);
@@ -888,7 +999,7 @@ public class InterfaceModules {
         lbl_nameArticle = new Label("Name of Article");
         lbl_nameArticle.setVisible(false);
         lbl_nameArticle.setTextFill(Color.WHITE);
-        lbl_nameArticle.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_nameArticle.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
         gpn_enterLoan.add(lbl_nameArticle, 0, 3);
 
         tfd_nameArticle = new TextField();
@@ -912,7 +1023,7 @@ public class InterfaceModules {
         lbl_signature = new Label("Article Signature");
         lbl_signature.setVisible(false);
         lbl_signature.setTextFill(Color.WHITE);
-        lbl_signature.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_signature.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
         gpn_enterLoan.add(lbl_signature, 0, 2);
 
         tfd_signatureB = new TextField("ISBN-");
@@ -934,7 +1045,7 @@ public class InterfaceModules {
         lbl_deliveryDay = new Label("Delivery day");
         lbl_deliveryDay.setVisible(false);
         lbl_deliveryDay.setTextFill(Color.WHITE);
-        lbl_deliveryDay.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_deliveryDay.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
         gpn_enterLoan.add(lbl_deliveryDay, 3, 2);
 
         DatePicker dpk_loanDay = new DatePicker(LocalDate.now());
@@ -984,14 +1095,14 @@ public class InterfaceModules {
 
         lbl_warning = new Label("¡Unregistered loan!");
         lbl_warning.setVisible(false);
-        lbl_warning.setTextFill(Color.RED);
+        lbl_warning.setTextFill(Color.FLORALWHITE);
         //lbl_warning.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         gpn_enterLoan.add(lbl_warning, 3, 4, 4, 6);
 
         lbl_success = new Label("¡The loan was registered!");
         lbl_success.setVisible(false);
-        lbl_success.setTextFill(Color.GREEN);
-        lbl_success.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_success.setTextFill(Color.FLORALWHITE);
+        lbl_success.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
         gpn_enterLoan.add(lbl_success, 3, 4, 4, 6);
 
         ToggleGroup group = new ToggleGroup();
@@ -1071,8 +1182,8 @@ public class InterfaceModules {
 
         Label lbl_notValueEnter = new Label("Fill all spaces");
         lbl_notValueEnter.setVisible(false);
-        lbl_notValueEnter.setTextFill(Color.RED);
-        lbl_notValueEnter.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        lbl_notValueEnter.setTextFill(Color.FLORALWHITE);
+        lbl_notValueEnter.setFont(Font.font("OPEN SANS", FontWeight.BOLD, 16));
         gpn_enterLoan.add(lbl_notValueEnter, 3, 4, 4, 6);
 
         btn_enterLoan = new Button("Enter Loan");
