@@ -27,15 +27,15 @@ public class StudentFile {
         ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(path + name));
         output.writeUnshared(s);
         output.close();
-
     }
     
+    //M'etodo para serializar la lista de estudiantes
     public void serializeList(Student student) throws IOException, ClassNotFoundException {
 
-        
         File studentFile = new File(path+ name);
         List<Student> studentArray = new ArrayList<Student>();
 
+        //Validaci'on
         if (studentFile.exists()) {
             ObjectInputStream objectInput = new ObjectInputStream(new FileInputStream(path + name));
             Object aux = objectInput.readObject();
@@ -50,27 +50,27 @@ public class StudentFile {
         output.writeUnshared(studentArray);
 
         output.close();
-    }
+    }//Fin del m'etodo
     
+    //M'etodo para leer la lista de estudiantes (lista que ha sido serializada)
     public List<Student> readList() throws IOException, ClassNotFoundException {
 
         File studenFile = new File(path + name);
         List<Student> studentArray = new ArrayList<Student>();
 
-        
+        //Validaci'on
         if (studenFile.exists()) {
             ObjectInputStream objectInput = new ObjectInputStream(new FileInputStream(path + name));
             Object aux = objectInput.readObject();
 
-            System.out.println(aux.toString());
             studentArray = (List<Student>) aux;
             objectInput.close();
         }
         
         return studentArray;
-    }
+    }//Fin del m'etodo
     
-    //Retorna la info de estudiante
+    //Retorna la informaci'on de estudiante
     public String studentInfo(String idStudent) throws FileNotFoundException, ClassNotFoundException, OptionalDataException, IOException {
         String info= "";
         
@@ -83,9 +83,9 @@ public class StudentFile {
             }
         }//for
         return info;
-    }    
+    }//Fin del m'etodo
 
-}    
+}//Fin de la clase  
     
     
 

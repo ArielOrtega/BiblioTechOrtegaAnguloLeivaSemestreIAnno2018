@@ -1,8 +1,6 @@
 package Interface;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -11,7 +9,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -88,7 +85,7 @@ public class MainInterface extends Application {
             try {
                 hbx_window.getChildren().clear();
                 presenter.getChildren().clear();
-                presenter.getChildren().addAll(interfaceM.enterBooks());
+                presenter.getChildren().addAll(interfaceM.insertBooks());
             } catch (IOException ex) {
                 Logger.getLogger(MainInterface.class.getName()).log(Level.SEVERE, null, ex);
             }
