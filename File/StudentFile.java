@@ -85,7 +85,35 @@ public class StudentFile {
         return info;
     }//Fin del m'etodo
 
+    public String getStudentId(String career, String year, int number) {
+        String id= String.valueOf(career.charAt(0)
+            +String.valueOf(year.charAt(3))
+            +String.format("%03d", number));
+    
+    return id;        
+    }
+
+    public boolean checkStudentRecord(String idStudent) throws IOException, ClassNotFoundException {
+        
+        for (int i = 0; i < readList().size(); i++) {
+            if (readList().get(i).getId().equalsIgnoreCase(idStudent)) {
+                return true;
+            }
+        }//for
+        return false;        
+    }
+    
+    
+    public String[] autocompleteOptions() throws IOException, ClassNotFoundException{
+        
+        String[] options= new String[readList().size()];
+        
+        for (int i = 0; i < readList().size() ; i++) {
+            options[i]= readList().get(i).getId();
+        }
+        
+        return options;
+    }       
+
 }//Fin de la clase  
-    
-    
 

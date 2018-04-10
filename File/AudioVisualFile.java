@@ -182,4 +182,33 @@ public class AudioVisualFile {
         }//end for
         return availability;
     }
+    
+    public String[] autocompleteOptions() throws IOException{
+        BooksFile bf= new BooksFile(new File("./Books.dat"));
+        String[] options= new String[bf.getAllBooks().size()+getAllAudioVisuals().size()];
+        int j= 0;
+        for (int i = 0; i < bf.getAllBooks().size() + getAudioVisuals().size() ; i++) {
+            if (i < bf.getAllBooks().size()) {
+                options[i]= bf.getAllBooks().get(i).getName();
+            }
+            else{
+                options[j]= getAllAudioVisuals().get(j).getName();
+                j++;
+            }
+        }
+        
+        return options;
+    }    
+
+    public String getSignature(String nameArticle) throws IOException {
+        String signature="";
+    
+        for (int i = 0; i < getAllAudioVisuals().size() ; i++) {
+            if(getAllAudioVisuals().get(i).getName().equalsIgnoreCase(nameArticle)){
+                signature= getAllAudioVisuals().get(i).getSignature();
+            }
+        }
+        
+        return signature;
+    }
 }

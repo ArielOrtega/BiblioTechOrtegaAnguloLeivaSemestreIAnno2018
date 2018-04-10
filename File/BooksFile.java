@@ -205,5 +205,34 @@ public class BooksFile {
         ObservableList<Books> listBook = FXCollections.observableArrayList(bookArray);
         return listBook;
 
-    }//fin del m'etodo        
+    }//fin del m'etodo      
+    
+//    public String[] autocompleteOptions() throws IOException{
+//        String[] options= new String[getAllBooks().size()];
+//        int j= 0;
+//        for (int i = 0; i < getAllBooks().size() ; i++) {
+//            if (i < getAllBooks().size()) {
+//                options[i]= getAllBooks().get(i).getName();
+//            }
+//            else{
+//                options[j]= getAllBooks().get(j).getName();
+//                j++;
+//            }
+//        }
+//        
+//        return options;
+//    }        
+    
+    public String getSignature(String nameArticle) throws IOException{
+        
+        String signature="";
+    
+        for (int i = 0; i < getAllBooks().size() ; i++) {
+            if(getAllBooks().get(i).getName().equalsIgnoreCase(nameArticle)){
+                signature= getAllBooks().get(i).getSignature();
+            }
+        }
+        
+        return signature;
+    }    
 }//Fin de la clase
