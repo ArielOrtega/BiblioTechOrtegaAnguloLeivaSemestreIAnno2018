@@ -1055,7 +1055,7 @@ public class InterfaceModules {
         
         StudentFile sft = new StudentFile();
         String idOptions[] = sft.autocompleteOptions();
-        TextFields.bindAutoCompletion(tfd_nameArticle, idOptions);
+        TextFields.bindAutoCompletion(tfd_idStudent, idOptions);
 
         //Funci'on del TextField
         tfd_idStudent.setOnAction((event) -> {
