@@ -61,6 +61,7 @@ public class BooksFile {
                 randomAccessFile.writeUTF(book.getAutor());
                 randomAccessFile.writeUTF(book.getGenre());
                 randomAccessFile.writeUTF(book.getLanguage());
+                randomAccessFile.writeBoolean(book.isDigital());
                 randomAccessFile.writeUTF(book.getName());
                 randomAccessFile.writeUTF(book.getSignature());
                 randomAccessFile.writeInt(book.getAvailability());
@@ -91,6 +92,7 @@ public class BooksFile {
             bookTemp.setAutor(randomAccessFile.readUTF());
             bookTemp.setGenre(randomAccessFile.readUTF());
             bookTemp.setLanguage(randomAccessFile.readUTF());
+            bookTemp.setDigital(randomAccessFile.readBoolean());
             bookTemp.setName(randomAccessFile.readUTF());
             bookTemp.setSignature(randomAccessFile.readUTF());
             bookTemp.setAvailability(randomAccessFile.readInt());

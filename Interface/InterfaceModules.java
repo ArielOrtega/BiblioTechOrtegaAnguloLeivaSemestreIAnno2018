@@ -35,11 +35,13 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
@@ -60,6 +62,7 @@ public class InterfaceModules {
     ObservableList<Student> observableArrayStudent = FXCollections.observableArrayList();
     ArrayList<Student> arrayListStudent = new ArrayList<>();
     static String genre, idiom;
+    static boolean digital;
     static int valueDelivery1, valueDelivery2, valueDelivery3;
     static LocalDate date1;
     static Label lbl_choise, lbl_signature, lbl_deliveryDay, lbl_warning, lbl_success, lbl_idStudent, lbl_info, lbl_nameArticle;
@@ -434,6 +437,12 @@ public class InterfaceModules {
         TextArea txa_description = new TextArea();
         txa_description.setPrefSize(400, 500);
         gpn_enterBooks.add(txa_description, 4, 4);
+        
+        //checkbox para verificar si es digital o no
+        CheckBox chk_digital = new CheckBox("It is digital?"); //**
+        chk_digital.setTextFill(Color.WHITE);
+        chk_digital.setFont((Font.font("OPEN SANS", FontWeight.BOLD, 15))); //**
+        gpn_enterBooks.add(chk_digital, 4, 5);//**
 
         //Button para ingresar el libro
         Button btn_enterBook = new Button("Insert Book");
@@ -466,6 +475,13 @@ public class InterfaceModules {
 
                 genre = cbx_genre.getValue() + "";
                 idiom = cbx_idiom.getValue() + "";
+                
+                if (chk_digital.isSelected()) {
+                    digital = true;
+                } else {
+                    digital = false;
+                }
+                
                 try {
 
                     if (tfd_signatureBo.getText().length() < 9) {
@@ -474,7 +490,7 @@ public class InterfaceModules {
                         //Instancia de la clase BooksFile para el manejo de sds m'etodos
                         BooksFile bfile = new BooksFile(new File("./Books.dat"));
                         //Se pasan por par'ametro el valor de sus atributos
-                        Books book1 = new Books(tfd_author.getText(), genre, idiom, tfd_name.getText(), tfd_signatureBo.getText(), 1, txa_description.getText());
+                        Books book1 = new Books(tfd_author.getText(), genre, idiom, digital, tfd_name.getText(), tfd_signatureBo.getText(), 1, txa_description.getText());
 
                         lbl_wrongSignature.setVisible(false);
                         //Label para mostrar que se ha hecho un ingreso exitosamente
@@ -848,6 +864,18 @@ public class InterfaceModules {
         TableColumn lenguageBColumn = new TableColumn("Idiom");
         lenguageBColumn.setMinWidth(150);
         lenguageBColumn.setCellValueFactory(new PropertyValueFactory<>("language"));
+        
+        //Muestra si un libro es digital o no
+        TableColumn digitalColumn = new TableColumn("Digital"); //**
+        digitalColumn.setMinWidth(100); //**
+        digitalColumn.setCellValueFactory(new PropertyValueFactory<>("digital")); //**
+        digitalColumn.setCellFactory(col -> new TableCell<Books, Boolean>() {
+            @Override
+            protected void updateItem(Boolean item, boolean empty) {
+                super.updateItem(item, empty) ;
+                setText(empty ? null : item ? "Digital" : "Not Digital" );
+            }
+        });//**
 
         //Muestra la disponibilidad del libro
         TableColumn availabilityBColumn = new TableColumn("Availability");
@@ -861,7 +889,7 @@ public class InterfaceModules {
 
         //Agregaci'on de los n'odulos a la tabla
         tvw_viewBooks.getColumns().addAll(nameBColumn, authorBColumn, signatureBColumn, genreBColumn,
-                lenguageBColumn, availabilityBColumn, descriptionBColumn);
+                lenguageBColumn, digitalColumn, availabilityBColumn, descriptionBColumn);
         tvw_viewBooks.setPrefSize(1100, 375);
         gpn_viewMaterial.add(tvw_viewBooks, 1, 1);
 
@@ -1459,6 +1487,7 @@ public class InterfaceModules {
             lbl_nameArticle.setVisible(false);
             tfd_nameArticle.setVisible(false);
             lbl_enter.setVisible(true);
+            tfd_nameArticle.setDisable(false);
             lbl_studentInfo.setVisible(false);
         });
         gpn_enterLoan.add(btn_exit, 4, 6);

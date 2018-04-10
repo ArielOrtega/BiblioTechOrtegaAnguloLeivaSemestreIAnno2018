@@ -7,13 +7,15 @@ public class Books extends Material{
     private String author;
     private String genre;
     private String language;
+    private boolean digital;
     
     //Constructor
-    public Books(String author, String genre, String language, String name, String signature,  int availability, String description) {
+    public Books(String author, String genre, String language, boolean digital, String name, String signature,  int availability, String description) {
         super(name, signature, availability, description);
         this.author = author;
         this.genre = genre;
         this.language = language;
+        this.digital = digital;
     }//fin constructor
     
     //Constructor vac'io
@@ -49,17 +51,29 @@ public class Books extends Material{
         this.language = language;
     }//fin
 
+    public boolean isDigital() {
+        return digital;
+    }
+
+    public void setDigital(boolean digital) {
+        this.digital = digital;
+    }
+    
+    
+
 
     //toString
     @Override
-    public String toString() {
-        return super.toString() + "\nLibros{" + "autor=" + author + ", genero=" + genre + ", idioma=" + language + '}';
-    }//fin toString
+    public String toString(){        
+        return "Books{" + "author=" + author + ", genre=" + genre
+                + ", language=" + language + ", digital=" + digital + '}';
+    }
 
+    //fin toString
     //Madici'on del tamanno de cada valor del atrivuto
-    public int sizeInBytes(){        
+    public int sizeInBytes() {        
         return super.getName().length() * 2 + super.getSignature().length() * 2 + super.getDescription().length() * 2
-                + 4 + this.author.length() * 2 + this.genre.length() * 2 + this.language.length() * 2;
-    }//fin m'etodo
+                + 4 + this.author.length() * 2 + this.genre.length() * 2 + this.language.length() * 2 + 1;
+    } //fin m'etodo
 
 }//Fin clase
